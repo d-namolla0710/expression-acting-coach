@@ -1,0 +1,319 @@
+<!-- 
+ * Copyright (c) 2026 김도원, 김민찬, 윤효령
+ *
+ * This file is part of "표정연기 도우미 AI".
+ *
+ * "표정연기 도우미 AI" is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * "표정연기 도우미 AI" is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!--
+이 페이지에는 네이버에서 제공한 나눔글꼴(나눔스퀘어)이 적용되어 있습니다.
+
+Copyright (c) 2010, NAVER Corporation (https://www.navercorp.com/) with Reserved Font Name Nanum, Naver Nanum, NanumGothic, Naver NanumGothic, NanumMyeongjo, Naver NanumMyeongjo, NanumBrush, Naver NanumBrush, NanumPen, Naver NanumPen, Naver NanumGothicEco, NanumGothicEco, Naver NanumMyeongjoEco, NanumMyeongjoEco, Naver NanumGothicLight, NanumGothicLight, NanumBarunGothic, Naver NanumBarunGothic, NanumSquareRound, NanumBarunPen, MaruBuri, NanumSquareNeo
+
+​This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
+T​his license is copied below, and is also available with a FAQ at: http://scripts.sil.org/OFL
+
+SIL OPEN FONT LICENSE
+
+Version 1.1 - 26 February 2007 
+-->
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team. 23 - 표정 연기 도우미</title>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='favicon/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='favicon/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='favicon/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='favicon/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='favicon/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='favicon/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='favicon/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-icon-180x180.png') }}">
+
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='favicon/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+
+    <link rel="manifest" href="{{ url_for('static', filename='favicon/manifest.json') }}">
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='favicon/ms-icon-144x144.png') }}">
+    <meta name="theme-color" content="#ffffff">
+
+    <style>
+      @import url('https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css');
+      
+      *:not(hr) {
+        margin: 0;
+        padding: 0;
+        border: none;
+      
+        font-family: 'nanumsquare';
+      }
+      *::-webkit-scrollbar {
+        display: none;
+      }
+
+      .wh100 {
+        width: 100dvw;
+        height: 100dvh;
+        position: relative;
+      }
+
+      @keyframes start-bg_ani {
+        0% {
+          background-color: rgb(237, 221, 83);
+        }
+        25% {
+          background-color: rgb(237, 221, 83);
+        }
+        35% {
+          background-color: rgb(209, 110, 184);
+        }
+        60% {
+          background-color: rgb(209, 110, 184);
+        }
+        70% {
+          background-color: rgb(42, 123, 155);
+        }
+        95% {
+          background-color: rgb(42, 123, 155);
+        }
+        100% {
+          background-color: rgb(237, 221, 83);
+        }
+      }
+      #start {
+        animation-name: start-bg_ani;
+        animation-duration: 20s;
+        animation-iteration-count: infinite;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        transition: transform 0.5s ease;
+
+        z-index: 999;
+      }
+
+      .start-btn_box {
+        width: 100dvw;
+        height: 40dvh;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+      .start-btn {
+        width: 40dvw;
+        height: 10dvh;
+        
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 2.5dvh;
+
+        font-size: larger;
+        font-weight: 600;
+      }
+      .start-btn:active {
+        transition-duration: 0.5s;
+        transform: rotate(1turn);
+      }
+
+      .start-title_box {
+        width: 100dvw;
+        height: 30dvh;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+      }
+      .start-title {
+        font-size: 2.5em;
+        text-align: center;
+      }
+      .start-subtitle {
+        font-size: 2em;
+        text-align: center;
+        color: #333;
+        margin-top: 0.4em;
+      }
+
+      .start-faces_box {
+        width: 100dvw;
+        height: 30dvh;
+        
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: end;
+
+        position: relative;
+      }
+      @keyframes start-face_ani_ied {
+        0% {
+          transform: rotate(0deg);
+        }
+        5% {
+          transform: rotate(5deg);
+        }
+        15% {
+          transform: rotate(-5deg);
+        }
+        20% {
+          transform: rotate(0deg) scaleY(1);
+        }
+        30% {
+          transform: scaleY(1.1);
+        }
+        50% {
+          transform: rotate(0deg) scaleY(1);
+        }
+        60% {
+          transform: rotate(10deg);
+        }
+        65% {
+          transform: rotate(-5deg);
+        }
+        70% {
+          transform: rotate(1turn);
+        }
+        75% {
+          transform: rotate(-45deg);
+        }
+        80% {
+          transform: rotate(0deg) scale(1);
+        }
+        85% {
+          transform: scale(1.1);
+        }
+        87% {
+          transform: scale(0.8);
+        }
+        90% {
+          transform: scale(1.1);
+        }
+        92% {
+          transform: scale(1);
+        }
+      }
+      @keyframes start-face_ani {
+        0% {
+          transform: rotate(0deg);
+        }
+        5% {
+          transform: rotate(5deg);
+        }
+        15% {
+          transform: rotateY(-5deg);
+        }
+        20% {
+          transform: rotate(0deg) scaleY(1);
+        }
+        30% {
+          transform: scaleY(1.1) rotateX(-45deg);
+        }
+        50% {
+          transform: rotate(0deg) scaleY(1);
+        }
+        60% {
+          transform: rotate(10deg);
+        }
+        65% {
+          transform: rotate(-5deg);
+        }
+        70% {
+          transform: rotate(1turn);
+        }
+        75% {
+          transform: rotate(-45deg);
+        }
+        80% {
+          transform: rotate(0deg) scaleY(1) rotateX(0deg);
+        }
+        85% {
+          transform: translateY(21dvh) scaleY(1.1) rotateX(45deg);
+        }
+        87% {
+          transform: translateY(18dvh) scaleY(0.8);
+        }
+        90% {
+          transform: translateY(25dvh) scaleY(1.1) rotateX(45deg);
+        }
+        92% {
+          transform: translateY(0px) scaleY(1) rotateX(0deg);
+        }
+      }
+      .start-face_svg {
+        animation-name: start-face_ani;
+        animation-duration: 20s;
+        animation-iteration-count: infinite;
+
+        transition-duration: 1s;
+        transition-timing-function: ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="start" class="wh100">
+      <div class="start-main">
+        <div class="start-title_box">
+          <h1 class="start-title">표정 연기 도우미</h1>
+          <h2 class="start-subtitle">앱 설치</h2>
+        </div>
+        <div class="start-faces_box">
+          <svg class="start-face_svg" id="start-face_svg" width="150px" height="150px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="12" r="9.5" stroke="#222222" stroke-linecap="round"></circle> <path d="M8.20857 15.378C8.63044 15.7433 9.20751 16.0237 9.86133 16.2124C10.5191 16.4023 11.256 16.5 12 16.5C12.744 16.5 13.4809 16.4023 14.1387 16.2124C14.7925 16.0237 15.3696 15.7433 15.7914 15.378" stroke="#222222" stroke-linecap="round"></path> <circle cx="9" cy="10" r="1" fill="#222222" stroke="#222222" stroke-linecap="round"></circle> <circle cx="15" cy="10" r="1" fill="#222222" stroke="#222222" stroke-linecap="round"></circle> </g></svg>
+        </div>
+        <div class="start-btn_box">
+          <button class="start-btn" id="start-btn" onpointerup="installApp()" disabled>Install!!</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      let deferredPrompt = null;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        document.getElementById("start-btn").disabled = false;
+      });
+
+      async function installApp() {
+        if (!deferredPrompt) {
+          alert("설치할 수 있는 상태가 아니에요.");
+          return;
+        }
+
+        deferredPrompt.prompt();
+
+        const result = await deferredPrompt.userChoice;
+        console.log(result.outcome);
+
+        deferredPrompt = null;
+        document.getElementById("start-btn").disabled = true;
+      }
+    </script>
+  </body>
+</html>

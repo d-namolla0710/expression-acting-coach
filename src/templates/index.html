@@ -1,0 +1,1197 @@
+<!-- 
+ * Copyright (c) 2026 김도원, 김민찬, 윤효령
+ *
+ * This file is part of "표정연기 도우미 AI".
+ *
+ * "표정연기 도우미 AI" is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * "표정연기 도우미 AI" is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!--
+이 페이지에는 네이버에서 제공한 나눔글꼴(나눔스퀘어)이 적용되어 있습니다.
+
+Copyright (c) 2010, NAVER Corporation (https://www.navercorp.com/) with Reserved Font Name Nanum, Naver Nanum, NanumGothic, Naver NanumGothic, NanumMyeongjo, Naver NanumMyeongjo, NanumBrush, Naver NanumBrush, NanumPen, Naver NanumPen, Naver NanumGothicEco, NanumGothicEco, Naver NanumMyeongjoEco, NanumMyeongjoEco, Naver NanumGothicLight, NanumGothicLight, NanumBarunGothic, Naver NanumBarunGothic, NanumSquareRound, NanumBarunPen, MaruBuri, NanumSquareNeo
+
+​This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
+T​his license is copied below, and is also available with a FAQ at: http://scripts.sil.org/OFL
+
+SIL OPEN FONT LICENSE
+
+Version 1.1 - 26 February 2007 
+-->
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team. 23 - 표정 연기 도우미</title>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='favicon/apple-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='favicon/apple-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='favicon/apple-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='favicon/apple-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='favicon/apple-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='favicon/apple-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='favicon/apple-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon/apple-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-icon-180x180.png') }}">
+
+    <link rel="icon" type="image/png" sizes="144x144" href="{{ url_for('static', filename='favicon/android-icon-144x144.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='favicon/android-icon-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='favicon/android-icon-512x512.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon/favicon-96x96.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+
+    <link rel="manifest" href="{{ url_for('static', filename='favicon/manifest.json') }}">
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='favicon/ms-icon-144x144.png') }}">
+    <meta name="theme-color" content="#ffffff">
+
+    <style>
+      @import url('https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css');
+      
+      *:not(hr) {
+        margin: 0;
+        padding: 0;
+        border: none;
+      
+        font-family: 'nanumsquare';
+      }
+      *::-webkit-scrollbar {
+        display: none;
+      }
+
+      .wh100 {
+        width: 100dvw;
+        height: 100dvh;
+        position: relative;
+      }
+
+      @keyframes start-bg_ani {
+        0% {
+          background-color: rgb(237, 221, 83);
+        }
+        25% {
+          background-color: rgb(237, 221, 83);
+        }
+        35% {
+          background-color: rgb(209, 110, 184);
+        }
+        60% {
+          background-color: rgb(209, 110, 184);
+        }
+        70% {
+          background-color: rgb(42, 123, 155);
+        }
+        95% {
+          background-color: rgb(42, 123, 155);
+        }
+        100% {
+          background-color: rgb(237, 221, 83);
+        }
+      }
+      #start {
+        animation-name: start-bg_ani;
+        animation-duration: 20s;
+        animation-iteration-count: infinite;
+
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        transition: transform 0.5s ease;
+
+        z-index: 999;
+      }
+
+      .start-btn_box {
+        width: 100dvw;
+        height: 40dvh;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+      .start-btn {
+        width: 40dvw;
+        height: 10dvh;
+        
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 2.5dvh;
+
+        font-size: larger;
+        font-weight: 600;
+      }
+      .start-btn:active {
+        transition-duration: 0.5s;
+        transform: rotate(1turn);
+      }
+
+      .start-title_box {
+        width: 100dvw;
+        height: 30dvh;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: end;
+      }
+      .start-title {
+        font-size: 2.5em;
+        text-align: center;
+      }
+
+      .start-faces_box {
+        width: 100dvw;
+        height: 30dvh;
+        
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: end;
+
+        position: relative;
+      }
+      @keyframes start-face_ani {
+        0% {
+          transform: rotate(0deg);
+        }
+        5% {
+          transform: rotate(5deg);
+        }
+        15% {
+          transform: rotateY(-5deg);
+        }
+        20% {
+          transform: rotate(0deg) scaleY(1);
+        }
+        30% {
+          transform: scaleY(1.1) rotateX(-45deg);
+        }
+        50% {
+          transform: rotate(0deg) scaleY(1);
+        }
+        60% {
+          transform: rotate(10deg);
+        }
+        65% {
+          transform: rotate(-5deg);
+        }
+        70% {
+          transform: rotate(1turn);
+        }
+        75% {
+          transform: rotate(-45deg);
+        }
+        80% {
+          transform: rotate(0deg) scaleY(1) rotateX(0deg);
+        }
+        85% {
+          transform: translateY(21dvh) scaleY(1.1) rotateX(45deg);
+        }
+        87% {
+          transform: translateY(18dvh) scaleY(0.8);
+        }
+        90% {
+          transform: translateY(25dvh) scaleY(1.1) rotateX(45deg);
+        }
+        92% {
+          transform: translateY(0px) scaleY(1) rotateX(0deg);
+        }
+      }
+      .start-face_svg {
+        animation-name: start-face_ani;
+        animation-duration: 20s;
+        animation-iteration-count: infinite;
+
+        transition-duration: 1s;
+        transition-timing-function: ease-in-out;
+      }
+      
+      #revisit {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        display: none;
+      }
+      #revisit > h1 {
+        font-size: 2em;
+      }
+
+      #upload {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transition: background-color 0.5s;
+        flex-direction: column;
+      }
+
+      #upload-inputbox_noview {
+        display: none;
+      }
+      .file_uploadbox {
+        flex: 1 1 0;
+        min-width: 0;
+        height: 25dvh;
+
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+
+        margin-bottom: 3dvh;
+      }
+      .file_upload {
+        width: 100%;
+        height: calc(25dvh - 1em - 1.6dvw);
+        box-sizing: border-box;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        border: 0.8dvw black solid;
+        border-radius: calc((25dvh - 1em - 1.6dvw) / 6);
+        border-style: dashed;
+
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+
+        position: relative;
+        overflow: hidden;
+      }
+      .file_upload_bg {
+        position: absolute;
+        inset: -10px;
+
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+
+        filter: blur(1px);
+        transform: scale(1);
+        z-index: 0;
+      }
+      .file_upload_content {
+        position: relative;
+        z-index: 1;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .file_upload_content > small {
+        color: black;
+        z-index: 9999;
+      }
+      .uploadboxinh4 {
+        margin-top: 0.5dvh;
+        margin-bottom: 0.5dvh;
+        margin-left: calc((25dvh - 1em - 1.6dvw)/12);
+      }
+      .file_upload_btn {
+        width: 5dvh;
+        height: 5dvh;
+
+        border: 0.4dvw black solid;
+        border-style: dotted;
+        border-radius: 50%;
+        
+        color: black;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-size: 1.75em;
+        font-weight: 400;
+
+        margin-bottom: 1.5dvh;
+        z-index: 9999;
+      }
+      .file_upload_ambient {
+        position: absolute;
+        inset: -8%;
+
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+
+        filter: blur(24px) brightness(0.9) saturate(1.05);
+        transform: scale(1.15);
+        z-index: 0;
+      }
+
+      #uploadbox-rolebox {
+        width: 94.4dvw;
+        height: calc((25dvh - 1em - 1.6dvw) - ((25dvh - 1em - 1.6dvw) / 6));
+
+        border: 0.8dvw black solid;
+        border-radius: calc((25dvh - 1em - 1.6dvw) / 6);
+
+        overflow: auto;
+        resize: none;
+
+        padding-top: calc(((25dvh - 1em - 1.6dvw) / 6) / 2);
+        padding-bottom: calc(((25dvh - 1em - 1.6dvw) / 6) / 2);
+        padding-left: 2dvw;
+        padding-right: 2dvw;
+        
+      }
+
+      .file_uploadimgss {
+        width: 100dvw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+        gap: 2dvw;
+      }
+
+      #upload-feedbackbtn {
+        width: 40dvw;
+        height: 10dvh;
+
+        margin-left: 30dvw;
+        margin-right: 30dvw;
+        margin-top: 5dvh;
+        
+        background-color: rgb(147, 192, 0);
+
+        border-radius: 3.5dvh;
+      }
+      #upload_title {
+        margin-top: 2dvh;
+        margin-bottom: 2dvh;
+        margin-left: 3dvw;
+      }
+
+      progress {
+        appearance: none;
+        -webkit-appearance: none;
+      }
+
+      *::-webkit-progress-bar {
+        border-radius: 9999px;
+      }
+      *::-webkit-progress-value {
+        border-radius: 9999px;
+      }
+      #var_result_progress-per {
+        position: relative;
+      }
+      #var_result_progress-per::before {
+        content: attr(value)"%";
+        position: absolute;
+        left: 5%;
+        top: 50%;
+        transform: translate(15%, -50%);
+        font-size: 1.5dvh;
+        color: black;
+      }
+      #var_result_progress-per::-webkit-progress-bar {
+        background-color: #DDD;
+      }
+      #var_result_progress-per::-webkit-progress-value {
+        background-color: springgreen;
+        border-radius: 9999px;
+      }
+      .mpsl_progress {
+        width: 45dvw;
+        height: 2.5dvh;
+
+        margin-top: 0.25dvh;
+        margin-bottom: 0.25dvh;
+        
+        position: relative;
+      }
+      .mpsl_progress::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 2.5%;
+        top: 50%;
+        transform: translate(5%, -50%);
+        font-size: 1.5dvh;
+        color: black;
+      }
+      .mpsl_progress::-webkit-progress-bar {
+        background-color: #DDD;
+      }
+      .mpsl_progress::-webkit-progress-value {
+        background: linear-gradient(
+          285deg,
+          #2a7b9b 0%,
+          #93c000 37%,
+          #d16eb8 73%,
+          #eddd53 100%
+        );
+
+        background-size: 45dvw 100%;
+        background-repeat: no-repeat;
+        border-radius: 9999px;
+      }
+
+      #result-content {
+        width: 100dvw;
+        height: 95dvh;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: flex-start;
+      }
+      #result_loading {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #var_result_progress-msg {
+        text-align: center;
+      }
+      #var_result_progress-per_ui {
+        margin-top: 2dvh;
+        margin-bottom: 5dvh;
+      }
+
+      .spinner {
+        width: 20dvw;
+        height: 20dvw;
+      }
+
+      .spinner svg {
+        width: 100%;
+        height: 100%;
+        transform-origin: center;
+        animation: rotate 2s linear infinite;
+      }
+
+      .spinner .ring {
+        fill: none;
+        stroke: #888;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 90;
+        stroke-dashoffset: 60;
+        animation: dash 1.5s ease-in-out infinite;
+      }
+
+      @keyframes rotate {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes dash {
+        0% {
+          stroke-dasharray: 1, 150;
+          stroke-dashoffset: 0;
+        }
+        50% {
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: -35;
+        }
+        100% {
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: -124;
+        }
+      }
+      #LoadingBox {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #result_loadingloading {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #FontSourceBox {
+        width: 100dvw;
+        height: 2.5em;
+        
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #FontSource {
+        font-size: 0.5em;
+      }
+      #result-content_llmfedb {
+        width: calc(100dvw - 3dvh);
+        height: 23dvh;
+        
+        border: 0.5dvh #888 solid;
+        border-radius: 2dvh;
+
+        padding: 1dvh 1dvh;
+
+        overflow-y: scroll;
+        white-space: none;
+        display: inline;
+        word-break: break-all;
+      }
+      #result-content_fedbtrgt {
+        width: calc(100dvw);
+        height: 70dvh;
+
+        overflow-x: hidden;
+        overflow-y: scroll;
+
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        flex-direction: column;
+
+        gap: 2dvh;
+      }
+      #result-content_fedbtrgt::-webkit-scrollbar {
+        appearance: none;
+        -webkit-appearance: none;
+        display: block;
+        width: 1.5dvh;
+      }
+      #result-content_fedbtrgt::-webkit-scrollbar-track {
+        background-color: #DDD;
+        border-radius: 9999px;
+      }
+      #result-content_fedbtrgt::-webkit-scrollbar-thumb {
+        width: 1.5dvh;
+        border-radius: 9999px;
+
+        background-color: #AAA;
+      }
+      .var_result_m_img {
+        width: 90dvw;
+        height: 25dvh;
+
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center;
+
+        border-radius: 2dvh;
+        margin-bottom: 2dvh;
+
+        margin: 0 auto;
+      }
+      .mp_ress {
+        width: 90dvw;
+        height: 18.25dvh;
+        
+        display: flex;
+        align-items: start;
+        justify-content: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        margin-top: 1dvh;
+        margin: 0 auto;
+      }
+      .sl_ress {
+        width: 90dvw;
+        height: 8dvh;
+        
+        display: flex;
+        align-items: start;
+        justify-content: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin: 0 auto;
+      }
+      #result > h3 {
+        width: 100dvw;
+        height: 5dvh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #result-content_llmfedb::-webkit-scrollbar {
+        appearance: none;
+        -webkit-appearance: none;
+        display: block;
+        width: 1.5dvh;
+      }
+      #result-content_llmfedb::-webkit-scrollbar-track {
+        background-color: #DDD;
+        border-radius: 9999px;
+        border-top-left-radius: 2dvh;
+        border-bottom-left-radius: 2dvh;
+      }
+      #result-content_llmfedb::-webkit-scrollbar-thumb {
+        width: 1.5dvh;
+        border-radius: 9999px;
+
+        background-color: #AAA;
+      }
+      #result {
+        display: none;
+      }
+      #error {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      .ftft {
+        width: 100dvw;
+        height: 70dvh;
+      }
+      .uploadboxinh4_res {
+        width: 98dvw;
+        height: 3dvh;
+
+        padding-left: 2dvw;
+        font-size: 2.5dvh;
+      }
+      .var_resultsl_txtbox {
+        display: flex;
+        flex-direction: column;
+      }
+      .var_result_txtval_mp {
+        margin-left: 5dvw;
+        margin-bottom: 2dvh;
+      }
+      #ifinstall {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="view">
+      <div id="start" class="wh100">
+        <div class="start-main">
+          <div class="start-title_box">
+            <h1 class="start-title"><span>표</span><span>정</span> <span>연</span><span>기</span> <span>도</span><span>우</span><span>미</span></h1>
+          </div>
+          <div class="start-faces_box">
+            <svg class="start-face_svg" id="start-face_svg" width="150px" height="150px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="12" r="9.5" stroke="#222222" stroke-linecap="round"></circle> <path d="M8.20857 15.378C8.63044 15.7433 9.20751 16.0237 9.86133 16.2124C10.5191 16.4023 11.256 16.5 12 16.5C12.744 16.5 13.4809 16.4023 14.1387 16.2124C14.7925 16.0237 15.3696 15.7433 15.7914 15.378" stroke="#222222" stroke-linecap="round"></path> <circle cx="9" cy="10" r="1" fill="#222222" stroke="#222222" stroke-linecap="round"></circle> <circle cx="15" cy="10" r="1" fill="#222222" stroke="#222222" stroke-linecap="round"></circle> </g></svg>
+          </div>
+          <div class="start-btn_box">
+            <button class="start-btn" id="start-btn">Start!!</button>
+          </div>
+        </div>
+      </div>
+      <div id="revisit" class="wh100">
+        <h1>다시 만나서 반가워요!</h1>
+        <div class="start-faces_box">
+          <svg class="start-face_svg" id="revisit-face_svg" style="animation: none;" width="150px" height="150px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="12" cy="12" r="9.5" stroke="#222222" stroke-linecap="round"></circle> <path d="M8.20857 15.378C8.63044 15.7433 9.20751 16.0237 9.86133 16.2124C10.5191 16.4023 11.256 16.5 12 16.5C12.744 16.5 13.4809 16.4023 14.1387 16.2124C14.7925 16.0237 15.3696 15.7433 15.7914 15.378" stroke="#222222" stroke-linecap="round"></path> <circle cx="9" cy="10" r="1" fill="#222222" stroke="#222222" stroke-linecap="round"></circle> <circle cx="15" cy="10" r="1" fill="#222222" stroke="#222222" stroke-linecap="round"></circle> </g></svg>
+        </div>
+      </div>
+      <div id="upload" class="wh100">
+        <div>
+          <div id="upload-inputbox_noview">
+            <input type="file" id="upload-feedbackimg" accept="image/jpeg,image/jpg,image/png">
+            <input type="file" id="upload-targetimg" accept="image/jpeg,image/jpg,image/png">
+          </div>
+          <h3 id="upload_title">이미지 업로드/텍스트 작성</h3>
+          <small style="margin-left: 2dvw;">*지원하는 확장자: .jpg, .jpeg, .png</small>
+          <div class="file_uploadimgss">
+            <div class="file_uploadbox" id="file-feedbackimg_uploadbox">
+              <h4 class="uploadboxinh4">피드백 받을 이미지</h4>
+              <div class="file_upload" id="uploadbox-feedbackimg">
+                <div class="file_upload_bg"></div>
+                <div class="file_upload_ambient"></div>
+                <div class="file_upload_content">
+                  <div class="file_upload_btn">+</div>
+                  <small class="file_upload_msg">클릭하여 업로드 또는 변경</small>
+                </div>
+              </div>
+            </div>
+            <div class="file_uploadbox" id="file-targetimg_uploadbox">
+              <h4 class="uploadboxinh4">따라하고 싶은 이미지</h4>
+              <div class="file_upload" id="uploadbox-targetimg">
+                <div class="file_upload_bg"></div>
+                <div class="file_upload_ambient"></div>
+                
+                <div class="file_upload_content">
+                  <div class="file_upload_btn">+</div>
+                  <small class="file_upload_msg">클릭하여 업로드 또는 변경</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 class="uploadboxinh4">연기하고 싶은 상황/이미지 설명</h4>
+            <textarea id="uploadbox-rolebox"></textarea>
+          </div>
+          <div>
+            <button id="upload-feedbackbtn">피드백 받기</button>
+          </div>
+        </div>
+      </div>
+      <div id="result_loading" class="wh100">
+        <h3 id="var_result_progress-msg">
+          정상적으로 피드백이 요청되었습니다!
+          <br>
+          <span style="font-size: 1.025em; color: #999;">
+            곧 진행상황이 표시 됩니다.
+          </span>
+        </h3>
+        <h4 id="var_result_progress-per_ui">진행률: <progress id="var_result_progress-per" value="0" max="100"></progress></h4>
+        
+        <small>feedbackId: <span id="result-feedbackId">-</span></small>
+      </div>
+      <div id="result_loadingloading" class="wh100">
+        <div id="LoadingBox">
+          <div class="spinner">
+            <svg viewBox="0 0 50 50">
+              <circle class="ring" cx="25" cy="25" r="20"></circle>
+            </svg>
+          </div>
+          <h3>피드백 데이터 불러오는 중...</h3>
+        </div>
+      </div>
+      <div id="result" class="wh100">
+        <h3>피드백 및 분석 결과</h3>
+        <div id="result-content">
+          <div id="result-content_fedbtrgt">
+            <div id="result-content_fedb" class="ftft">
+              <h4 class="uploadboxinh4_res">피드백 받을 이미지</h4>
+              <div class="var_result_m_img" id="var_result_fedb_img"></div>
+              <div class="sl_ress">
+                <div class="var_resultsl_txtbox">
+                  <h5 id="var_result_fedb_sl_type_txt">-</h5>
+                  <progress class="mpsl_progress" id="var_result_fedb_sl_type" value="0" max="1000"></progress>
+                </div>
+                <div class="var_resultsl_txtbox">
+                  <h5 id="var_result_fedb_sl_detail_txt">-</h5>
+                  <progress class="mpsl_progress" id="var_result_fedb_sl_detail" value="0" max="1000"></progress>
+                </div>
+              </div>
+              <div class="var_result_txtval_mp">
+                <h5>얼굴 형: <span id="var_result_face-ratio_fedb"></span></h5>
+                <h5>입꼬리 올라간 정도: <span id="var_result_mouth-corner-lift_fedb"></span></h5>
+                <h5>눈썹이 기울어진 정도: <span id="var_result_eyebrow-slope_fedb"></span></h5>
+              </div>
+              <div class="mp_ress">
+                <progress class="mpsl_progress" id="var_result_fedb_mp-1" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-2" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-3" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-4" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-5" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-6" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-7" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_fedb_mp-8" value="0" max="1000"></progress>
+              </div>
+            </div>
+            <div id="result-content_trgt" class="ftft">
+              <h4 class="uploadboxinh4_res">따라하고 싶은 이미지</h4>
+              <div class="var_result_m_img" id="var_result_trgt_img"></div>
+              <div class="sl_ress">
+                <div class="var_resultsl_txtbox">
+                  <h5 id="var_result_trgt_sl_type_txt">-</h5>
+                  <progress class="mpsl_progress" id="var_result_trgt_sl_type" value="0" max="1000"></progress>
+                </div>
+                <div class="var_resultsl_txtbox">
+                  <h5 id="var_result_trgt_sl_detail_txt">-</h5>
+                  <progress class="mpsl_progress" id="var_result_trgt_sl_detail" value="0" max="1000"></progress>
+                </div>
+              </div>
+              <div class="var_result_txtval_mp">
+                <h5>얼굴 형: <span id="var_result_face-ratio_trgt"></span></h5>
+                <h5>입꼬리 올라간 정도: <span id="var_result_mouth-corner-lift_trgt"></span></h5>
+                <h5>눈썹이 기울어진 정도: <span id="var_result_eyebrow-slope_trgt"></span></h5>
+              </div>
+              <div class="mp_ress">
+                <progress class="mpsl_progress" id="var_result_trgt_mp-1" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-2" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-3" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-4" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-5" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-6" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-7" value="0" max="1000"></progress>
+                <progress class="mpsl_progress" id="var_result_trgt_mp-8" value="0" max="1000"></progress>
+              </div>
+            </div>
+          </div>
+          <div id="result-content_llmfedb"></div>
+        </div>
+      </div>
+    </div>
+    <div id="error" class="wh100">
+      <h1>Something Wrong!!</h1>
+      <br>
+      코드에 문제가 있습니다.<br><br>
+      개발자에게 문의해주세요.<br>
+      E-Mail: rlaalscks130710@gmail.com
+    </div>
+    <div id="FontSourceBox">
+      <div id="ifinstall">
+        <a href="/i"><small>앱 버전도 있어요! (설치하려면 클릭)</small></a>
+      </div>
+      <small id="FontSource">이 페이지에는 네이버에서 제공한 나눔스퀘어 글꼴이 적용되어 있습니다.</small>
+    </div>
+    
+    <script>
+      document.getElementById("FontSource").onpointerdown = () => {
+        document.getElementById("FontSourceBox").style.display = "none";
+      };
+
+      function rand(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      var start_btn = document.getElementById("start-btn");
+
+      var last_StartBox_bgcolor;
+      function start2upload() {
+        document.getElementById("start").style.position = "relative";
+        last_StartBox_bgcolor = getComputedStyle(document.getElementById("start")).backgroundColor;
+        document.getElementById("upload").style.backgroundColor = last_StartBox_bgcolor;
+        document.getElementById("upload").style.display = "flex";
+        document.getElementById("start").style.transform = "scale(0.01) rotate(1turn)";
+        setTimeout(() => {
+          document.getElementById("start").style.display = "none";
+          document.getElementById("upload").style.backgroundColor = "rgb(245, 245, 245)";
+          document.getElementById("upload").style.position = "";
+          document.getElementById("upload").style.left = "";
+          document.getElementById("upload").style.top = "";
+          document.getElementById("upload").style.position = "relative";
+        }, 500);
+      }
+      start_btn.onpointerdown = (e) => {
+        e.preventDefault();
+        start2upload();
+      }
+
+      var feedbackimgbox = document.getElementById("uploadbox-feedbackimg")
+      var targetimgbox = document.getElementById("uploadbox-targetimg")
+      var feedbackimginp = document.getElementById("upload-feedbackimg")
+      var targetimginp = document.getElementById("upload-targetimg")
+      var feedbackimgbg = feedbackimgbox.querySelector(".file_upload_bg");
+      var targetimgbg = targetimgbox.querySelector(".file_upload_bg");
+
+      function inputimg(boxname){
+        var box = document.getElementById(`upload-${boxname}img`);
+        box.click();
+      }
+
+      feedbackimgbox.onpointerup = (e) => { e.preventDefault(); inputimg("feedback"); }
+      targetimgbox.onpointerup = (e) => { e.preventDefault(); inputimg("target"); }
+
+      feedbackimginp.onchange = () => {
+        const input = feedbackimginp;
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            feedbackimgbg.style.backgroundImage = `url("${e.target.result}")`;
+            document.getElementById("var_result_fedb_img").style.backgroundImage = `url("${e.target.result}")`;
+          };
+          reader.readAsDataURL(input.files[0]);
+        } else {
+          feedbackimgbg.style.backgroundImage = "";
+          document.getElementById("var_result_fedb_img").style.backgroundImage = "";
+        }
+      };
+
+      targetimginp.onchange = () => {
+        const input = targetimginp;
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            targetimgbg.style.backgroundImage = `url("${e.target.result}")`;
+            document.getElementById("var_result_trgt_img").style.backgroundImage = `url("${e.target.result}")`;
+          };
+          reader.readAsDataURL(input.files[0]);
+        } else {
+          targetimgbg.style.backgroundImage = "";
+          document.getElementById("var_result_trgt_img").style.backgroundImage = "";
+        }
+      };
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      async function countdownReload(baseMsg) {
+        const el = document.getElementById("var_result_progress-msg");
+
+        for (let i = 5; i >= 0; i--) {
+          el.innerHTML = `
+            ${baseMsg}<br>
+            <span style="font-size: 1.2em; color: #999;">
+              ${i}초 뒤 메인화면으로 돌아갑니다.
+            </span>
+          `;
+          await sleep(1000);
+        }
+
+        location.reload();
+      }
+      function connectFeedbackSSE(feedbackId) {
+        const evt = new EventSource(`/api/feedback/stream/${feedbackId}`);
+
+        evt.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+
+          if (typeof data.progress === "number") {
+            document.getElementById("var_result_progress-per").value = data.progress;
+            if(data.status == "queued") {
+              document.getElementById("var_result_progress-msg").innerText = `${data.message}, ${(data.queue_ahead != -1) ? data.queue_ahead+"명 대기 중..." : "대기열 순서 계산 중..."}`;
+            } else {
+              document.getElementById("var_result_progress-msg").innerText = data.message;
+            }
+          }
+          
+          if(data.status == "error") {
+            evt.close();
+            console.error(data.error);
+            
+            countdownReload(data.message);
+          }
+
+          if (data.status == "done") {
+            evt.close();
+
+            sleep(rand(500, 750));
+            document.getElementById("result_loading").style.display = "none";
+            document.getElementById("result_loadingloading").style.display = "flex";
+            sleep(rand(1250, 1750));
+            document.getElementById("result_loadingloading").style.display = "none";
+            document.getElementById("result").style.display = "block";
+
+
+            const result = data.result;
+
+            var labels = {
+              // face_ratio: "얼굴 비율", // 0
+
+              eye_open: "눈 뜬 정도",
+              eye_width: "눈 가로 길이",
+              eye_eyebrow_distance: "눈과 눈썹 거리",
+              eye_asymmetry: "눈 비대칭 정도",
+
+              mouth_open: "입 벌어진 정도",
+              mouth_width: "입 가로 길이",
+              // mouth_corner_lift: "입꼬리 올라간 정도", // 7
+              mouth_asymmetry: "입 비대칭 정도",
+
+              nostril_width: "콧구멍 폭 정도",
+              // eyebrow_slope: "눈썹 기울기" // 10
+            };
+
+            var siglip_labels = {
+              "happy": "행복해 보이는 ",
+              "sad": "슬퍼 보이는 ",
+              "angry": "화나 보이는 ",
+              "surprise": "놀란 것 같아 보이는 ",
+              "fear": "공포스러워 보이는 ",
+              "embarrassed": "당황한 것 같아 보이는 "
+            }
+            
+            document.getElementById(`var_result_fedb_sl_type_txt`).innerText = siglip_labels[result.siglip.fedb.type.label] + "얼굴";
+            document.getElementById(`var_result_fedb_sl_type`).dataset.label = Math.round(result.siglip.fedb.type.score * 100 * 100) / 100 + "%";
+            document.getElementById(`var_result_fedb_sl_type`).value = Number(Math.round(result.siglip.fedb.type.score * 1000));
+            document.getElementById(`var_result_fedb_sl_detail_txt`).innerText = result.siglip.fedb.detail.label;
+            document.getElementById(`var_result_fedb_sl_detail`).dataset.label = Math.round(result.siglip.fedb.detail.score * 100 * 100) / 100 + "%";
+            document.getElementById(`var_result_fedb_sl_detail`).value = Number(Math.round(result.siglip.fedb.detail.score * 1000));
+          
+            var face_ratio_fedb = result.mediapipe.fedb.noscore_value.face_ratio;
+              var mouth_corner_lift_fedb = result.mediapipe.fedb.noscore_value.mouth_corner_lift;
+              var eyebrow_slope_fedb = result.mediapipe.fedb.noscore_value.eyebrow_slope;
+              
+              var face_ratio_fedb_label = (face_ratio_fedb < 0.9) ? "넓은 얼굴" : (face_ratio_fedb >= 0.9 && face_ratio_fedb < 1.1) ? "둥근 얼굴" : (face_ratio_fedb >= 1.1 && face_ratio_fedb < 1.25) ? "긴 얼굴" : "매우 긴 얼굴";
+              var mouth_corner_lift_fedb_label = (mouth_corner_lift_fedb < -0.03) ? "입꼬리가 많이 내려감" : (mouth_corner_lift_fedb >= -0.03 && mouth_corner_lift_fedb < -0.01) ? "입꼬리가 살짝 내려감" : (mouth_corner_lift_fedb >= -0.01 && mouth_corner_lift_fedb < 0) ? "중간" : (mouth_corner_lift_fedb >= 0 && mouth_corner_lift_fedb < 0.01) ? "입꼬리가 살짝 올라감" :  "입꼬리가 많이 올라감";
+              var eyebrow_slope_fedb_label = (eyebrow_slope_fedb < -0.02) ? "눈썹이 많이 내려감" : (eyebrow_slope_fedb >= -0.02 && eyebrow_slope_fedb < -0.01) ? "눈썹이 살짝 내려감" : (eyebrow_slope_fedb >= -0.01 && eyebrow_slope_fedb < 0) ? "중간" : (eyebrow_slope_fedb >= 0 && eyebrow_slope_fedb < 0.01) ? "눈썹이 살짝 올라감" : "눈썹 많이 올라감"
+
+              document.getElementById("var_result_face-ratio_fedb").innerText = face_ratio_fedb_label;
+              document.getElementById("var_result_mouth-corner-lift_fedb").innerText = mouth_corner_lift_fedb_label;
+              document.getElementById("var_result_eyebrow-slope_fedb").innerText = eyebrow_slope_fedb_label;
+
+            for(var idx = 0; idx < Object.keys(result.mediapipe.fedb.score_value).length; idx++){
+              var key = Object.keys(result.mediapipe.fedb.score_value)[idx];
+              document.getElementById(`var_result_fedb_mp-${idx+1}`).dataset.label = `${labels[key]}, ${Math.round(result.mediapipe.fedb.score_value[key] * 100) / 100}%`;
+              document.getElementById(`var_result_fedb_mp-${idx+1}`).value = Number(Math.round(result.mediapipe.fedb.score_value[key] * 10));
+            }
+
+            if(result.mode == "imgMode"){
+              document.getElementById(`var_result_trgt_sl_type_txt`).innerText = siglip_labels[result.siglip.trgt.type.label] + "얼굴";
+              document.getElementById(`var_result_trgt_sl_type`).dataset.label = Math.round(result.siglip.trgt.type.score * 100 * 100) / 100 + "%";
+              document.getElementById(`var_result_trgt_sl_type`).value = Number(Math.round(result.siglip.trgt.type.score * 1000));
+              document.getElementById(`var_result_trgt_sl_detail_txt`).innerText = result.siglip.trgt.detail.label;
+              document.getElementById(`var_result_trgt_sl_detail`).dataset.label = Math.round(result.siglip.trgt.detail.score * 100 * 100) / 100 + "%";
+              document.getElementById(`var_result_trgt_sl_detail`).value = Number(Math.round(result.siglip.trgt.detail.score * 1000));
+              
+              var face_ratio_trgt = result.mediapipe.trgt.noscore_value.face_ratio;
+              var mouth_corner_lift_trgt = result.mediapipe.trgt.noscore_value.mouth_corner_lift;
+              var eyebrow_slope_trgt = result.mediapipe.trgt.noscore_value.eyebrow_slope;
+              
+              var face_ratio_trgt_label = (face_ratio_trgt < 0.9) ? "넓은 얼굴" : (face_ratio_trgt >= 0.9 && face_ratio_trgt < 1.1) ? "둥근 얼굴" : (face_ratio_trgt >= 1.1 && face_ratio_trgt < 1.25) ? "긴 얼굴" : "매우 긴 얼굴";
+              var mouth_corner_lift_trgt_label = (mouth_corner_lift_trgt < -0.03) ? "입꼬리가 많이 내려감" : (mouth_corner_lift_trgt >= -0.03 && mouth_corner_lift_trgt < -0.01) ? "입꼬리가 살짝 내려감" : (mouth_corner_lift_trgt >= -0.01 && mouth_corner_lift_trgt < 0) ? "중간" : (mouth_corner_lift_trgt >= 0 && mouth_corner_lift_trgt < 0.01) ? "입꼬리가 살짝 올라감" :  "입꼬리가 많이 올라감";
+              var eyebrow_slope_trgt_label = (eyebrow_slope_trgt < -0.02) ? "눈썹이 많이 내려감" : (eyebrow_slope_trgt >= -0.02 && eyebrow_slope_trgt < -0.01) ? "눈썹이 살짝 내려감" : (eyebrow_slope_trgt >= -0.01 && eyebrow_slope_trgt < 0) ? "중간" : (eyebrow_slope_trgt >= 0 && eyebrow_slope_trgt < 0.01) ? "눈썹이 살짝 올라감" : "눈썹 많이 올라감"
+
+              document.getElementById("var_result_face-ratio_trgt").innerText = face_ratio_trgt_label;
+              document.getElementById("var_result_mouth-corner-lift_trgt").innerText = mouth_corner_lift_trgt_label;
+              document.getElementById("var_result_eyebrow-slope_trgt").innerText = eyebrow_slope_trgt_label;
+              
+              for(var idx = 0; idx < Object.keys(result.mediapipe.trgt.score_value).length; idx++){
+                var key = Object.keys(result.mediapipe.trgt.score_value)[idx];
+                document.getElementById(`var_result_trgt_mp-${idx+1}`).dataset.label = `${labels[key]}, ${Math.round(result.mediapipe.trgt.score_value[key] * 100) / 100}%`;
+                document.getElementById(`var_result_trgt_mp-${idx+1}`).value = Number(Math.round(result.mediapipe.trgt.score_value[key] * 10));
+              }
+            }
+
+            document.getElementById("result-content_llmfedb").innerText = `${result.feedback}`;
+          }
+        };
+
+        evt.onerror = (err) => {
+          evt.close();
+          console.error("SSE 연결 오류:", err);
+
+          countdownReload("서버와 연결 중 오류가 발생했습니다.");
+        };
+      }
+
+      document.getElementById("upload-feedbackbtn").onpointerup = () => {
+        var imgInp_feedbackImg = document.getElementById("upload-feedbackimg");
+        var imgInp_targetImg = document.getElementById("upload-targetimg");
+        var txtInp_promptTxt = document.getElementById("uploadbox-rolebox");
+        
+        if((imgInp_feedbackImg.value == "" || imgInp_feedbackImg.value == false)){ return alert("피드백 이미지는 필수 입력칸입니다."); }
+        
+        var mode = "imgMode";
+        if((imgInp_targetImg.value == "" || imgInp_targetImg.value == false)){
+          mode = "txtMode";
+        }
+
+        if(mode == "imgMode" &&
+          ((imgInp_feedbackImg.value == "" || imgInp_feedbackImg.value == false) ||
+          (imgInp_targetImg.value == "" || imgInp_targetImg.value == false))
+        ){ return alert("피드백 이미지 또는 목표 이미지가 입력되지 않았습니다."); }
+
+        if(mode == "txtMode" &&
+          ((imgInp_feedbackImg.value == "" || imgInp_feedbackImg.value == false) ||
+          (txtInp_promptTxt.value == "" || txtInp_promptTxt.value == false))
+        ){ return alert("피드백 이미지 또는 상황 설명이 입력되지 않았습니다."); }
+
+
+
+        var formdt = new FormData();
+
+        formdt.append("mode", mode);
+        formdt.append("fedbImg", imgInp_feedbackImg.files[0]);
+        if (mode == "imgMode") { formdt.append("trgtImg", imgInp_targetImg.files[0]); }
+
+        if(txtInp_promptTxt.value == "" && txtInp_promptTxt.value == false){ formdt.append("prompt", "[사용자가 입력하지 않음]"); }
+        else { formdt.append("prompt", txtInp_promptTxt.value); }
+        
+        let date = new Date();
+        let utc = date.getTime() + (date.getTimezoneOffset() * 60 * 1000);
+        var kst_diff = 9 * 60 * 60 * 1000;
+        let kst = new Date(utc + (kst_diff));
+        var day_label = ["일", "월", "화", "수", "목", "금", "토"];
+        formdt.append("time", `KST - ${String(kst.getFullYear())}.${String(kst.getMonth()+1)}.${String(kst.getDate())}. (${day_label[kst.getDay()]}) ${String(kst.getHours())}:${String(kst.getMinutes())}:${String(kst.getSeconds())}.${String(kst.getMilliseconds())}`);
+        
+        document.getElementById("upload").style.display = "none";
+        document.getElementById("result_loading").style.display = "flex";
+        
+        if(mode == "txtMode") {
+          document.getElementById("result-content_trgt").style.display = "none";
+        }
+        
+        fetch(window.location.origin + "/api/feedback", {
+          method: "POST",
+          body: formdt,
+          headers: {}
+        }).then((res) => {
+          return res.json();
+        }).then((data) => {
+          if (data.rttype != "success") {
+            alert(data.message || "피드백 요청에 실패했습니다.");
+            return;
+          }
+          
+          const feedbackId = data.feedbackId;
+          document.getElementById("result-feedbackId").innerText = feedbackId;
+
+          connectFeedbackSSE(feedbackId);
+        }).catch((err) => {
+          console.error(err);
+          
+          countdownReload("피드백 요청 중 오류가 발생했습니다.");
+        });
+      }
+
+      function showView(viewName){
+        if(viewName == "result") { document.getElementById("result").style.display = "block"; return; }
+        document.getElementById(viewName).style.display = "flex";
+        if(viewName == "upload") { document.getElementById("upload").style.position = "relative"; }
+      }
+      function hideView(viewName){
+        document.getElementById(viewName).style.display = "none";
+      }
+      // ---------------------------- 개발 완료후 변경 ---------------------------------- //
+      // showView("start");                        // 최  조    접  속 화면
+      // showView("revisit");                      // 재     접     속 화면
+      // showView("upload");                       // 업     로     드 화면
+      // showView("result_loading");               // 피 드 백   대 기 화면
+      // showView("result_loadingloading");        // 피드백 로딩 대기 화면
+      // showView("result");                       // 피 드 백   결 과 화면
+
+      // hideView("error");                        // 에            러 화면
+      // ---------------------------------------------------------------------------------
+      window.onload = () => {
+        if(window.localStorage.getItem("first_visit") == null || 
+           window.localStorage.getItem("first_visit") == undefined ||
+           window.localStorage.getItem("first_visit") == NaN ||
+           typeof(Number(window.localStorage.getItem("first_visit"))) != "number"
+          ){
+          document.getElementById("start").style.display = "flex";
+          window.localStorage.setItem("first_visit", 1)
+        } else {
+          window.localStorage.setItem("first_visit", Number(window.localStorage.getItem("first_visit"))+1)
+          document.querySelector("#revisit > h1").innerText = "다시 만나서 반가워요!\n" + window.localStorage.getItem("first_visit") + "번째 만남이군요!"
+          document.getElementById("revisit").style.display = "flex";
+          setTimeout(() => {
+            document.getElementById("revisit").style.display = "none";
+            document.getElementById("upload").style.display = "flex";
+            document.getElementById("upload").style.position = "relative";
+          }, 1000)
+        }
+        document.getElementById("error").style.display = "none";
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        document.getElementById("ifinstall").style.display = "block";
+      });
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('SW 되는 듯.'));
+      }
+    </script>
+  </body>
+</html>
