@@ -17,3 +17,6 @@ uploads/
 
 tools
 tools/runapp.py
+
+%SystemDrive%
+%SystemDrive%/*
