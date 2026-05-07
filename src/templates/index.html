@@ -790,9 +790,9 @@ Version 1.1 - 26 February 2007
                 </div>
               </div>
               <div class="var_result_txtval_mp">
-                <h5>얼굴 형: <span id="var_result_face-ratio_fedb"></span></h5>
-                <h5>입꼬리 올라간 정도: <span id="var_result_mouth-corner-lift_fedb"></span></h5>
-                <h5>눈썹이 기울어진 정도: <span id="var_result_eyebrow-slope_fedb"></span></h5>
+                <h5>얼굴 세로/가로 비율: <span id="var_result_face-ratio_fedb"></span></h5>
+                <h5>입꼬리 높이 변화: <span id="var_result_mouth-corner-lift_fedb"></span></h5>
+                <h5>눈썹 기울기 정도: <span id="var_result_eyebrow-slope_fedb"></span></h5>
               </div>
               <div class="mp_ress">
                 <progress class="mpsl_progress" id="var_result_fedb_mp-1" value="0" max="1000"></progress>
@@ -819,9 +819,9 @@ Version 1.1 - 26 February 2007
                 </div>
               </div>
               <div class="var_result_txtval_mp">
-                <h5>얼굴 형: <span id="var_result_face-ratio_trgt"></span></h5>
-                <h5>입꼬리 올라간 정도: <span id="var_result_mouth-corner-lift_trgt"></span></h5>
-                <h5>눈썹이 기울어진 정도: <span id="var_result_eyebrow-slope_trgt"></span></h5>
+                <h5>얼굴 세로/가로 비율: <span id="var_result_face-ratio_trgt"></span></h5>
+                <h5>입꼬리 높이 변화: <span id="var_result_mouth-corner-lift_trgt"></span></h5>
+                <h5>눈썹 기울기 정도: <span id="var_result_eyebrow-slope_trgt"></span></h5>
               </div>
               <div class="mp_ress">
                 <progress class="mpsl_progress" id="var_result_trgt_mp-1" value="0" max="1000"></progress>
@@ -983,22 +983,22 @@ Version 1.1 - 26 February 2007
 
             const result = data.result;
 
-            var labels = {
-              // face_ratio: "얼굴 비율", // 0
+           const labels = {
+            eye_open: "눈 높이/눈 폭 비율",
+            eye_width: "눈 폭/양눈 사이 거리",
+            eye_eyebrow_distance: "눈썹-눈 거리/양눈 사이 거리",
+            eye_asymmetry: "좌우 눈 뜬 정도 차이",
 
-              eye_open: "눈 뜬 정도",
-              eye_width: "눈 가로 길이",
-              eye_eyebrow_distance: "눈과 눈썹 거리",
-              eye_asymmetry: "눈 비대칭 정도",
+            mouth_open: "입 높이/입 폭 비율",
+            mouth_width: "입 폭/양눈 사이 거리",
+            mouth_asymmetry: "좌우 입꼬리 높이 차이",
 
-              mouth_open: "입 벌어진 정도",
-              mouth_width: "입 가로 길이",
-              // mouth_corner_lift: "입꼬리 올라간 정도", // 7
-              mouth_asymmetry: "입 비대칭 정도",
+            nostril_width: "코 폭/양눈 사이 거리",
 
-              nostril_width: "콧구멍 폭 정도",
-              // eyebrow_slope: "눈썹 기울기" // 10
-            };
+            // face_ratio: "얼굴 세로/가로 비율",
+            // mouth_corner_lift: "입꼬리 높이 변화",
+            // eyebrow_slope: "눈썹 기울기 정도"
+          }
 
             var siglip_labels = {
               "happy": "행복해 보이는 ",
@@ -1017,16 +1017,32 @@ Version 1.1 - 26 February 2007
             document.getElementById(`var_result_fedb_sl_detail`).value = Number(Math.round(result.siglip.fedb.detail.score * 1000));
           
             var face_ratio_fedb = result.mediapipe.fedb.noscore_value.face_ratio;
-              var mouth_corner_lift_fedb = result.mediapipe.fedb.noscore_value.mouth_corner_lift;
-              var eyebrow_slope_fedb = result.mediapipe.fedb.noscore_value.eyebrow_slope;
-              
-              var face_ratio_fedb_label = (face_ratio_fedb < 0.9) ? "넓은 얼굴" : (face_ratio_fedb >= 0.9 && face_ratio_fedb < 1.1) ? "둥근 얼굴" : (face_ratio_fedb >= 1.1 && face_ratio_fedb < 1.25) ? "긴 얼굴" : "매우 긴 얼굴";
-              var mouth_corner_lift_fedb_label = (mouth_corner_lift_fedb < -0.03) ? "입꼬리가 많이 내려감" : (mouth_corner_lift_fedb >= -0.03 && mouth_corner_lift_fedb < -0.01) ? "입꼬리가 살짝 내려감" : (mouth_corner_lift_fedb >= -0.01 && mouth_corner_lift_fedb < 0) ? "중간" : (mouth_corner_lift_fedb >= 0 && mouth_corner_lift_fedb < 0.01) ? "입꼬리가 살짝 올라감" :  "입꼬리가 많이 올라감";
-              var eyebrow_slope_fedb_label = (eyebrow_slope_fedb < -0.02) ? "눈썹이 많이 내려감" : (eyebrow_slope_fedb >= -0.02 && eyebrow_slope_fedb < -0.01) ? "눈썹이 살짝 내려감" : (eyebrow_slope_fedb >= -0.01 && eyebrow_slope_fedb < 0) ? "중간" : (eyebrow_slope_fedb >= 0 && eyebrow_slope_fedb < 0.01) ? "눈썹이 살짝 올라감" : "눈썹 많이 올라감"
+            var mouth_corner_lift_fedb = result.mediapipe.fedb.noscore_value.mouth_corner_lift;
+            var eyebrow_slope_fedb = result.mediapipe.fedb.noscore_value.eyebrow_slope;
 
-              document.getElementById("var_result_face-ratio_fedb").innerText = face_ratio_fedb_label;
-              document.getElementById("var_result_mouth-corner-lift_fedb").innerText = mouth_corner_lift_fedb_label;
-              document.getElementById("var_result_eyebrow-slope_fedb").innerText = eyebrow_slope_fedb_label;
+            var face_ratio_fedb_label =
+            (face_ratio_fedb < 0.9) ? "넓은 얼굴" :
+            (face_ratio_fedb < 1.1) ? "둥근 얼굴" :
+            (face_ratio_fedb < 1.25) ? "긴 얼굴" :
+            "매우 긴 얼굴";
+
+            var mouth_corner_lift_fedb_label =
+            (mouth_corner_lift_fedb < -0.035) ? "입꼬리가 많이 내려감" :
+            (mouth_corner_lift_fedb < -0.015) ? "입꼬리가 살짝 내려감" :
+            (mouth_corner_lift_fedb < 0.015) ? "중립" :
+            (mouth_corner_lift_fedb < 0.035) ? "입꼬리가 살짝 올라감" :
+            "입꼬리가 많이 올라감";
+
+            var eyebrow_slope_fedb_label =
+            (eyebrow_slope_fedb < 35) ? "눈썹이 많이 내려감" :
+            (eyebrow_slope_fedb < 45) ? "눈썹이 살짝 내려감" :
+            (eyebrow_slope_fedb < 55) ? "중립" :
+            (eyebrow_slope_fedb < 65) ? "눈썹이 살짝 올라감" :
+            "눈썹이 많이 올라감";
+
+            document.getElementById("var_result_face-ratio_fedb").innerText = face_ratio_fedb_label;
+            document.getElementById("var_result_mouth-corner-lift_fedb").innerText = mouth_corner_lift_fedb_label;
+            document.getElementById("var_result_eyebrow-slope_fedb").innerText = eyebrow_slope_fedb_label;
 
             for(var idx = 0; idx < Object.keys(result.mediapipe.fedb.score_value).length; idx++){
               var key = Object.keys(result.mediapipe.fedb.score_value)[idx];
@@ -1042,13 +1058,29 @@ Version 1.1 - 26 February 2007
               document.getElementById(`var_result_trgt_sl_detail`).dataset.label = Math.round(result.siglip.trgt.detail.score * 100 * 100) / 100 + "%";
               document.getElementById(`var_result_trgt_sl_detail`).value = Number(Math.round(result.siglip.trgt.detail.score * 1000));
               
-              var face_ratio_trgt = result.mediapipe.trgt.noscore_value.face_ratio;
+               var face_ratio_trgt = result.mediapipe.trgt.noscore_value.face_ratio;
               var mouth_corner_lift_trgt = result.mediapipe.trgt.noscore_value.mouth_corner_lift;
               var eyebrow_slope_trgt = result.mediapipe.trgt.noscore_value.eyebrow_slope;
-              
-              var face_ratio_trgt_label = (face_ratio_trgt < 0.9) ? "넓은 얼굴" : (face_ratio_trgt >= 0.9 && face_ratio_trgt < 1.1) ? "둥근 얼굴" : (face_ratio_trgt >= 1.1 && face_ratio_trgt < 1.25) ? "긴 얼굴" : "매우 긴 얼굴";
-              var mouth_corner_lift_trgt_label = (mouth_corner_lift_trgt < -0.03) ? "입꼬리가 많이 내려감" : (mouth_corner_lift_trgt >= -0.03 && mouth_corner_lift_trgt < -0.01) ? "입꼬리가 살짝 내려감" : (mouth_corner_lift_trgt >= -0.01 && mouth_corner_lift_trgt < 0) ? "중간" : (mouth_corner_lift_trgt >= 0 && mouth_corner_lift_trgt < 0.01) ? "입꼬리가 살짝 올라감" :  "입꼬리가 많이 올라감";
-              var eyebrow_slope_trgt_label = (eyebrow_slope_trgt < -0.02) ? "눈썹이 많이 내려감" : (eyebrow_slope_trgt >= -0.02 && eyebrow_slope_trgt < -0.01) ? "눈썹이 살짝 내려감" : (eyebrow_slope_trgt >= -0.01 && eyebrow_slope_trgt < 0) ? "중간" : (eyebrow_slope_trgt >= 0 && eyebrow_slope_trgt < 0.01) ? "눈썹이 살짝 올라감" : "눈썹 많이 올라감"
+
+              var face_ratio_trgt_label =
+              (face_ratio_trgt < 0.9) ? "넓은 얼굴" :
+              (face_ratio_trgt < 1.1) ? "둥근 얼굴" :
+              (face_ratio_trgt < 1.25) ? "긴 얼굴" :
+              "매우 긴 얼굴";
+
+              var mouth_corner_lift_trgt_label =
+              (mouth_corner_lift_trgt < -0.035) ? "입꼬리가 많이 내려감" :
+              (mouth_corner_lift_trgt < -0.015) ? "입꼬리가 살짝 내려감" :
+              (mouth_corner_lift_trgt < 0.015) ? "중립" :
+              (mouth_corner_lift_trgt < 0.035) ? "입꼬리가 살짝 올라감" :
+              "입꼬리가 많이 올라감";
+
+              var eyebrow_slope_trgt_label =
+              (eyebrow_slope_trgt < 35) ? "눈썹이 많이 내려감" :
+              (eyebrow_slope_trgt < 45) ? "눈썹이 살짝 내려감" :
+              (eyebrow_slope_trgt < 55) ? "중립" :
+              (eyebrow_slope_trgt < 65) ? "눈썹이 살짝 올라감" :
+              "눈썹이 많이 올라감";
 
               document.getElementById("var_result_face-ratio_trgt").innerText = face_ratio_trgt_label;
               document.getElementById("var_result_mouth-corner-lift_trgt").innerText = mouth_corner_lift_trgt_label;

@@ -35,6 +35,7 @@ import os
 import uuid
 import json
 import time
+import math
 import socket
 from queue import Queue
 from threading import Thread, Lock
@@ -240,6 +241,9 @@ def to_score(ratio, max_ratio=1.0):
   """
   return clamp((ratio / max_ratio) * 100)
 
+def distance(a, b):
+  return math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
+
 def landmark(path):
   logInfo(f"landmark 함수가 호출되었습니다.")
 
@@ -251,96 +255,140 @@ def landmark(path):
         detect_result = landmarker.detect(mp_image)
 
     if not detect_result.face_landmarks:
-      return {"rttype": "error", "errcode": "FACE_NOT_FOUND", "message": "얼굴을 감지하지 못했습니다."}
+      return {
+        "rttype": "error",
+        "errcode": "FACE_NOT_FOUND",
+        "message": "얼굴을 감지하지 못했습니다."
+      }
 
     res = detect_result.face_landmarks[0]
 
-    # 얼굴 기준 값
-    face_width = abs(res[234].x - res[454].x)
-    face_height = abs(res[10].y - res[152].y)
+    # =========================
+    # 기본 기준 거리
+    # =========================
+    face_width = distance(res[234], res[454])
+    face_height = distance(res[10], res[152])
 
-    if face_width == 0 or face_height == 0:
-      return {"rttype": "error", "errcode": "FACE_SIZE_ERROR", "message": "얼굴너비 또는 얼굴높이가 0입니다."}
-
-    face_ratio = face_height / face_width  # dt_face_ratio
-
-    # 눈 열림
-    left_eye_height = abs(res[386].y - res[374].y)
-    right_eye_height = abs(res[159].y - res[145].y)
-
-    left_eye_width = abs(res[362].x - res[263].x)
-    right_eye_width = abs(res[133].x - res[33].x)
-
-    eye_height_avg = (left_eye_height + right_eye_height) / 2
+    left_eye_width = distance(res[33], res[133])
+    right_eye_width = distance(res[362], res[263])
     eye_width_avg = (left_eye_width + right_eye_width) / 2
 
-    eye_open_ratio = eye_height_avg / face_height  # dt_eye_open
-    eye_width_ratio = eye_width_avg / face_width  # dt_eye_width
+    left_eye_height = distance(res[386], res[374])
+    right_eye_height = distance(res[159], res[145])
+    eye_height_avg = (left_eye_height + right_eye_height) / 2
 
-    # 눈썹 ~ 눈 거리
-    left_eye_eyebrow_distance = abs(res[386].y - res[334].y)
-    right_eye_eyebrow_distance = abs(res[159].y - res[105].y)
+    # 양쪽 눈 사이 거리
+    interocular_distance = distance(res[133], res[362])
 
-    eye_eyebrow_distance_ratio = ((left_eye_eyebrow_distance + right_eye_eyebrow_distance) / 2) / face_height  # dt_eye_eyebrow_distance
+    # 입 기준 거리
+    mouth_height = distance(res[13], res[14])
+    mouth_width = distance(res[61], res[291])
 
-    # 눈썹 기울기  --  # 음수/양수 값이라사 0~100으로 만들기 위해 중앙값 50을 기준으로 사용함!
+    # 안전 체크
+    if min(
+      face_width,
+      face_height,
+      eye_width_avg,
+      interocular_distance,
+      mouth_width
+    ) <= 0.0001:
+      return {
+        "rttype": "error",
+        "errcode": "FACE_SIZE_ERROR",
+        "message": "얼굴 기준 거리가 너무 작습니다."
+      }
+
+    # =========================
+    # 얼굴 비율
+    # =========================
+    face_ratio = face_height / face_width
+
+    # =========================
+    # 눈 관련 값
+    # =========================
+    eye_open_ratio = eye_height_avg / eye_width_avg
+    eye_width_ratio = eye_width_avg / interocular_distance
+
+    left_eye_eyebrow_distance = distance(res[386], res[334])
+    right_eye_eyebrow_distance = distance(res[159], res[105])
+
+    eye_eyebrow_distance_ratio = (
+      (left_eye_eyebrow_distance + right_eye_eyebrow_distance) / 2
+    ) / interocular_distance
+
+    # 눈썹 기울기
+    # 음수/양수 값이라 0~100으로 만들기 위해 중앙값 50을 기준으로 사용
     left_eyebrow_slope = res[334].y - res[296].y
-    right_eyebrow_slope = res[105].y - res[66].y
+    right_eyebrow_slope = -(res[105].y - res[66].y)
 
-    eyebrow_slope_ratio = ((left_eyebrow_slope + right_eyebrow_slope) / 2) / face_height
-    eyebrow_slope_score = clamp(50 + eyebrow_slope_ratio * 200) # dt_eyebrow_slope
+    eyebrow_slope_ratio = (
+      (left_eyebrow_slope + right_eyebrow_slope) / 2
+    ) / interocular_distance
+
+    eyebrow_slope_score = clamp(50 + eyebrow_slope_ratio * 200)
 
     # 눈 비대칭
-    eye_asymmetry_ratio = abs(left_eye_height - right_eye_height) / face_height  # dt_eye_asymmetry
+    eye_asymmetry_ratio = abs(left_eye_height - right_eye_height) / eye_width_avg
 
-    # 입 벌어짐
-    mouth_height = abs(res[11].y - res[16].y)
-    mouth_width = abs(res[291].x - res[61].x)
+    # =========================
+    # 입 관련 값
+    # =========================
+    mouth_open_ratio = mouth_height / mouth_width
+    mouth_width_ratio = mouth_width / interocular_distance
 
-    mouth_open_ratio = mouth_height / face_height  # dt_mouth_open
-    mouth_width_ratio = mouth_width / face_width  # dt_mouth_width
-
-    # 콧구멍 벌어짐
-    nose_width = abs(res[98].x - res[327].x)
-    nostril_width_ratio = nose_width / face_width
-
-    # 입꼬리 높이
-    mouth_center_y = (res[11].y + res[16].y) / 2
+    mouth_center_y = (res[13].y + res[14].y) / 2
     left_corner_y = res[291].y
     right_corner_y = res[61].y
 
     corner_avg_y = (left_corner_y + right_corner_y) / 2
-    mouth_corner_lift_ratio = (mouth_center_y - corner_avg_y) / face_height  # dt_mouth_corner_lift 
 
-    # 입 비대칭 계산
-    mouth_asymmetry_ratio = abs(left_corner_y - right_corner_y) / face_height  # dt_mouth_asymmetry
+    # 값이 클수록 입꼬리가 올라간 상태
+    mouth_corner_lift_ratio = (
+      mouth_center_y - corner_avg_y
+    ) / interocular_distance
 
-    return {"rttype": "success", "data": {
-      "score_value": {
-        "eye_open": round(to_score(eye_open_ratio, 0.08), 2),
-        "eye_width": round(to_score(eye_width_ratio, 0.28), 2),
-        "eye_eyebrow_distance": round(to_score(eye_eyebrow_distance_ratio, 0.12), 2),
-        "eye_asymmetry": round(to_score(eye_asymmetry_ratio, 0.05), 2),
+    # 입 비대칭
+    mouth_asymmetry_ratio = abs(left_corner_y - right_corner_y) / interocular_distance
 
-        "mouth_open": round(to_score(mouth_open_ratio, 0.18), 2),
-        "mouth_width": round(to_score(mouth_width_ratio, 0.55), 2),
-        "mouth_asymmetry": round(to_score(mouth_asymmetry_ratio, 0.06), 2),
+    # =========================
+    # 코 관련 값
+    # =========================
+    nose_width = distance(res[98], res[327])
+    nose_width_ratio = nose_width / interocular_distance
 
-        "nostril_width": round(to_score(nostril_width_ratio, 0.32), 2)
-      },
-      "noscore_value": {
-        "face_ratio": round(face_ratio, 4),
-        "mouth_corner_lift": round(mouth_corner_lift_ratio, 2),
-        "eyebrow_slope": round(eyebrow_slope_score, 2)
+    # =========================
+    # 결과 반환
+    # =========================
+    return {
+      "rttype": "success",
+      "data": {
+        "score_value": {
+          "eye_open": round(to_score(eye_open_ratio, 0.38), 2),
+          "eye_width": round(to_score(eye_width_ratio, 0.75), 2),
+          "eye_eyebrow_distance": round(to_score(eye_eyebrow_distance_ratio, 0.45), 2),
+          "eye_asymmetry": round(to_score(eye_asymmetry_ratio, 0.35), 2),
+
+          "mouth_open": round(to_score(mouth_open_ratio, 0.80), 2),
+          "mouth_width": round(to_score(mouth_width_ratio, 1.60), 2),
+          "mouth_asymmetry": round(to_score(mouth_asymmetry_ratio, 0.25), 2),
+
+          "nostril_width": round(to_score(nose_width_ratio, 0.90), 2)
+        },
+        "noscore_value": {
+          "face_ratio": round(face_ratio, 4),
+          "mouth_corner_lift": round(mouth_corner_lift_ratio, 4),
+          "eyebrow_slope": round(eyebrow_slope_score, 2)
+        }
       }
-    }}
+    }
+
   except Exception as e:
     logWarn(f"Landmark 처리 중 오류 발생. errormsg: {str(e)}")
     return {
       "rttype": "error",
       "errcode": "LANDMARK_PROCESSING_ERROR",
       "message": f"Landmark 처리 중 오류가 발생했습니다: {str(e)}"
-    }  
+    }
 
 def siglip_classify(image, texts):
   inputs = siglip_processor(
