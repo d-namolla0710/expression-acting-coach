@@ -21,7 +21,8 @@
 PROJECT_DIR = "C:\\Users\\kmc13\\minchanCoding\\camp\\lalalalalalalast\\src\\"
 ##### 실행 옵션 ####
 SERVICE_PORT = 80  ## 웹사이트가 띄어질 포트
-LLM_MODEL = "gpt"  # "gemini" or "gpt"
+LLM_SWITCH = "Off" # llm 사용: On, llm 미사용: Off
+LLM_MODEL = "gemini"  # "gemini" or "gpt"
 GEMINI_MODELNAME = "gemini-3.1-flash-lite-preview"  # Google이 제작한 모델 사용시 모델명 입력.
 GPT_MODELNAME = "gpt-5.1"  # OpenAI가 제작한 모델 사용시 모델명 입력.
 ##### 보안설정 #####
@@ -64,15 +65,16 @@ def suppress_stderr():
     os.close(old_stderr_fd)
     os.close(devnull_fd)
 
+print()
+print(f" {Fore.CYAN}{'='*22} ")
+print(f"{Fore.CYAN}|{Style.RESET_ALL} {Fore.LIGHTMAGENTA_EX}{Style.BRIGHT} 표정연기 도우미 AI {Style.RESET_ALL} {Fore.CYAN}|{Style.RESET_ALL}")
+print(f" {Fore.CYAN}{'='*22} ")
+print()
+print(f"{Fore.WHITE}Copyright (c) 2026 {Style.BRIGHT}김도원, 김민찬, 윤효령{Style.RESET_ALL}")
+print()
+print(f"{Fore.LIGHTBLUE_EX}모델 준비 및 서버 실행 중...{Style.RESET_ALL}")
+
 if COSTOM_LOGGING == "On":
-  print()
-  print(f" {Fore.CYAN}{'='*22} ")
-  print(f"{Fore.CYAN}|{Style.RESET_ALL} {Fore.LIGHTMAGENTA_EX}{Style.BRIGHT} 표정연기 도우미 AI {Style.RESET_ALL} {Fore.CYAN}|{Style.RESET_ALL}")
-  print(f" {Fore.CYAN}{'='*22} ")
-  print()
-  print(f"{Fore.WHITE}Copyright (c) 2026 {Style.BRIGHT}김도원, 김민찬, 윤효령{Style.RESET_ALL}")
-  print()
-  print(f"{Fore.LIGHTBLUE_EX}모델 준비 및 서버 실행 중...{Style.RESET_ALL}")
 
   os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
   os.environ["GLOG_minloglevel"] = "3"
@@ -344,12 +346,12 @@ def landmark(path):
     eye_open_ratio = eye_height_avg / eye_width_avg
     eye_width_ratio = eye_width_avg / interocular_distance
 
-    left_eye_eyebrow_distance = distance(res[386], res[334])
-    right_eye_eyebrow_distance = distance(res[159], res[105])
+    left_brow_y = res[296].y
+    right_brow_y = res[66].y
 
-    eye_eyebrow_distance_ratio = (
-      (left_eye_eyebrow_distance + right_eye_eyebrow_distance) / 2
-    ) / interocular_distance
+    eyebrow_balance_ratio = (
+      left_brow_y - right_brow_y
+    ) / face_height
 
     # 눈썹 기울기
     # 50 = 중립, 50보다 작으면 내려감, 크면 올라감
@@ -396,20 +398,20 @@ def landmark(path):
       "data": {
         "score_value": {
           "eye_open": round(normalize(eye_open_ratio, 0.02, 0.55), 2),
-          "eye_width": round(normalize(eye_width_ratio, 0.15, 0.45), 2),
-          "eye_eyebrow_distance": round(normalize(eye_eyebrow_distance_ratio, 0.05, 0.35), 2),
+          "eye_width": round(normalize(eye_width_ratio, 0.10, 1.20), 2),
           "eye_asymmetry": round(normalize(eye_asymmetry_ratio, 0.00, 0.15), 2),
 
           "mouth_open": round(normalize(mouth_open_ratio, 0.00, 0.75), 2),
-          "mouth_width": round(normalize(mouth_width_ratio, 0.35, 1.10), 2),
+          "mouth_width": round(normalize(mouth_width_ratio, 0.20, 1.80), 2),
           "mouth_asymmetry": round(normalize(mouth_asymmetry_ratio, 0.00, 0.12), 2),
 
-          "nostril_width": round(normalize(nose_width_ratio, 0.18, 0.55), 2)
+          "nostril_width": round(normalize(nose_width_ratio, 0.05, 0.80), 2)
         },
         "noscore_value": {
           "face_ratio": round(face_ratio, 4),
           "mouth_corner_lift": round(mouth_corner_lift_ratio, 4),
-          "eyebrow_slope": round(eyebrow_slope_score, 2)
+          "eyebrow_slope": round(eyebrow_slope_score, 2),
+          "eyebrow_balance": round(eyebrow_balance_ratio, 4)
         }
       }
     }
@@ -434,16 +436,18 @@ def siglip_classify(image, texts):
     with torch.no_grad():
       outputs = siglip_model(**inputs)
 
-  probs = outputs.logits_per_image.softmax(dim=1)[0]
+  scores = outputs.logits_per_image[0]
 
-  best_idx = int(torch.argmax(probs).item())
+  display_probs = torch.softmax(scores, dim=0)
+
+  best_idx = int(torch.argmax(scores).item())
 
   return {
     "best_index": best_idx,
     "best_label": texts[best_idx],
-    "best_score": float(probs[best_idx].item()),
+    "best_score": float(display_probs[best_idx].item()),
     "scores": {
-      texts[i]: float(probs[i].item())
+      texts[i]: float(display_probs[i].item())
       for i in range(len(texts))
     }
   }
@@ -454,30 +458,49 @@ def siglip(path):
     image = Image.open(path).convert("RGB")
 
     # 감정 타입 분류
-    type_result = siglip_classify(image, FEELING_TYPES)
+    type_keys = list(FEELING_TYPES.keys())      # ["happy", "sad", ...]
+    type_texts = list(FEELING_TYPES.values())   # ["a smiling face", ...]
 
-    best_type = type_result["best_label"]
+    type_result = siglip_classify(image, type_texts)
+
+    best_type = type_keys[type_result["best_index"]]
+    best_type_text = type_texts[type_result["best_index"]]
 
     # 분류된 감정 타입 안에서 상세 라벨 분류
-    detail_labels = LABELS[best_type]
-    detail_result = siglip_classify(image, detail_labels)
+    detail_label_map = LABELS[best_type]
+
+    detail_ko_labels = list(detail_label_map.keys())
+    detail_en_labels = list(detail_label_map.values())
+
+    detail_result = siglip_classify(image, detail_en_labels)
+
+    best_detail_ko = detail_ko_labels[detail_result["best_index"]]
+    best_detail_en = detail_en_labels[detail_result["best_index"]]
 
     return {
       "rttype": "success",
       "type": {
         "label": best_type,
+        "analysis_label": best_type_text,
         "score": round(type_result["best_score"], 4),
         "scores": {
-          key: round(value, 4)
-          for key, value in type_result["scores"].items()
+          type_keys[i]: round(
+            type_result["scores"][type_texts[i]],
+            4
+          )
+          for i in range(len(type_keys))
         }
       },
       "detail": {
-        "label": detail_result["best_label"],
+        "label": best_detail_ko,
+        "analysis_label": best_detail_en,
         "score": round(detail_result["best_score"], 4),
         "scores": {
-          key: round(value, 4)
-          for key, value in detail_result["scores"].items()
+          detail_ko_labels[i]: round(
+            detail_result["scores"][detail_en_labels[i]],
+            4
+          )
+          for i in range(len(detail_ko_labels))
         }
       }
     }
@@ -605,116 +628,118 @@ def feedback(feedbackId):
     result["mediapipe"]["trgt"] = None
     result["siglip"]["trgt"] = None
 
-  set_job(
-    feedbackId,
-    progress=85,
-    message="최종 피드백을 생성 중입니다."
-  )
+  if LLM_SWITCH == "On":
+    set_job(
+      feedbackId,
+      progress=85,
+      message="최종 피드백을 생성 중입니다."
+    )
 
-  if(mode == "imgMode"):
-    llm_user_msg = f"""mode: {mode},
-User`s prompt: {prompt},
+    if(mode == "imgMode"):
+      llm_user_msg = f"""mode: {mode},
+  User`s prompt: {prompt},
 
-== features of feedback images ==
-face_ratio: {result['mediapipe']['fedb']["noscore_value"]['face_ratio']}
-eye_open: {result['mediapipe']['fedb']["score_value"]['eye_open']}
-eye_width: {result['mediapipe']['fedb']["score_value"]['eye_width']}
-eye_eyebrow_distance: {result['mediapipe']['fedb']["score_value"]['eye_eyebrow_distance']}
-eye_asymmetry: {result['mediapipe']['fedb']["score_value"]['eye_asymmetry']}
-mouth_open: {result['mediapipe']['fedb']["score_value"]['mouth_open']}
-mouth_width: {result['mediapipe']['fedb']["score_value"]['mouth_width']}
-mouth_corner_lift: {result['mediapipe']['fedb']["noscore_value"]['mouth_corner_lift']}
-mouth_asymmetry: {result['mediapipe']['fedb']["score_value"]['mouth_asymmetry']}
-nostril_width: {result['mediapipe']['fedb']["score_value"]['nostril_width']}
-eyebrow_slope: {result['mediapipe']['fedb']["noscore_value"]['eyebrow_slope']}
+  == features of feedback images ==
+  face_ratio: {result['mediapipe']['fedb']["noscore_value"]['face_ratio']}
+  eye_open: {result['mediapipe']['fedb']["score_value"]['eye_open']}
+  eye_width: {result['mediapipe']['fedb']["score_value"]['eye_width']}
+  eye_eyebrow_distance: {result['mediapipe']['fedb']["score_value"]['eye_eyebrow_distance']}
+  eye_asymmetry: {result['mediapipe']['fedb']["score_value"]['eye_asymmetry']}
+  mouth_open: {result['mediapipe']['fedb']["score_value"]['mouth_open']}
+  mouth_width: {result['mediapipe']['fedb']["score_value"]['mouth_width']}
+  mouth_corner_lift: {result['mediapipe']['fedb']["noscore_value"]['mouth_corner_lift']}
+  mouth_asymmetry: {result['mediapipe']['fedb']["score_value"]['mouth_asymmetry']}
+  nostril_width: {result['mediapipe']['fedb']["score_value"]['nostril_width']}
+  eyebrow_slope: {result['mediapipe']['fedb']["noscore_value"]['eyebrow_slope']}
 
-== speculated emotional information of the feedback image ==
-guessed feelings: {result['siglip']['fedb']['type']['label']}, accuracy:{result['siglip']['fedb']['type']['score']}%
-Facial features guessed based on emotion: {result['siglip']['fedb']['detail']['label']}, accuracy: {result['siglip']['fedb']['detail']['score']}%
+  == speculated emotional information of the feedback image ==
+  guessed feelings: {result['siglip']['fedb']['type']['label']}, accuracy:{result['siglip']['fedb']['type']['score']}%
+  Facial features guessed based on emotion: {result['siglip']['fedb']['detail']['label']}, accuracy: {result['siglip']['fedb']['detail']['score']}%
 
-== features of target images ==
-face_ratio: {result['mediapipe']['trgt']["noscore_value"]['face_ratio']}
-eye_open: {result['mediapipe']['trgt']["score_value"]['eye_open']}
-eye_width: {result['mediapipe']['trgt']["score_value"]['eye_width']}
-eye_eyebrow_distance: {result['mediapipe']['trgt']["score_value"]['eye_eyebrow_distance']}
-eye_asymmetry: {result['mediapipe']['trgt']["score_value"]['eye_asymmetry']}
-mouth_open: {result['mediapipe']['trgt']["score_value"]['mouth_open']}
-mouth_width: {result['mediapipe']['trgt']["score_value"]['mouth_width']}
-mouth_corner_lift: {result['mediapipe']['trgt']["noscore_value"]['mouth_corner_lift']}
-mouth_asymmetry: {result['mediapipe']['trgt']["score_value"]['mouth_asymmetry']}
-nostril_width: {result['mediapipe']['trgt']["score_value"]['nostril_width']}
-eyebrow_slope: {result['mediapipe']['trgt']["noscore_value"]['eyebrow_slope']}
+  == features of target images ==
+  face_ratio: {result['mediapipe']['trgt']["noscore_value"]['face_ratio']}
+  eye_open: {result['mediapipe']['trgt']["score_value"]['eye_open']}
+  eye_width: {result['mediapipe']['trgt']["score_value"]['eye_width']}
+  eye_eyebrow_distance: {result['mediapipe']['trgt']["score_value"]['eye_eyebrow_distance']}
+  eye_asymmetry: {result['mediapipe']['trgt']["score_value"]['eye_asymmetry']}
+  mouth_open: {result['mediapipe']['trgt']["score_value"]['mouth_open']}
+  mouth_width: {result['mediapipe']['trgt']["score_value"]['mouth_width']}
+  mouth_corner_lift: {result['mediapipe']['trgt']["noscore_value"]['mouth_corner_lift']}
+  mouth_asymmetry: {result['mediapipe']['trgt']["score_value"]['mouth_asymmetry']}
+  nostril_width: {result['mediapipe']['trgt']["score_value"]['nostril_width']}
+  eyebrow_slope: {result['mediapipe']['trgt']["noscore_value"]['eyebrow_slope']}
 
-== speculated emotional information of the target image ==
-guessed feelings: {result['siglip']['trgt']['type']['label']}, accuracy:{result['siglip']['trgt']['type']['score']}%
-Facial features guessed based on emotion: {result['siglip']['trgt']['detail']['label']}, accuracy: {result['siglip']['trgt']['detail']['score']}%
-"""
-  elif(mode == "txtMode"):
-    llm_user_msg = f"""mode: {mode},
-User`s prompt: {prompt},
+  == speculated emotional information of the target image ==
+  guessed feelings: {result['siglip']['trgt']['type']['label']}, accuracy:{result['siglip']['trgt']['type']['score']}%
+  Facial features guessed based on emotion: {result['siglip']['trgt']['detail']['label']}, accuracy: {result['siglip']['trgt']['detail']['score']}%
+  """
+    elif(mode == "txtMode"):
+      llm_user_msg = f"""mode: {mode},
+  User`s prompt: {prompt},
 
-== features of feedback images ==
-face_ratio: {result['mediapipe']['fedb']["noscore_value"]['face_ratio']}
-eye_open: {result['mediapipe']['fedb']["score_value"]['eye_open']}
-eye_width: {result['mediapipe']['fedb']["score_value"]['eye_width']}
-eye_eyebrow_distance: {result['mediapipe']['fedb']["score_value"]['eye_eyebrow_distance']}
-eye_asymmetry: {result['mediapipe']['fedb']["score_value"]['eye_asymmetry']}
-mouth_open: {result['mediapipe']['fedb']["score_value"]['mouth_open']}
-mouth_width: {result['mediapipe']['fedb']["score_value"]['mouth_width']}
-mouth_corner_lift: {result['mediapipe']['fedb']["noscore_value"]['mouth_corner_lift']}
-mouth_asymmetry: {result['mediapipe']['fedb']["score_value"]['mouth_asymmetry']}
-nostril_width: {result['mediapipe']['fedb']["score_value"]['nostril_width']}
-eyebrow_slope: {result['mediapipe']['fedb']["noscore_value"]['eyebrow_slope']}
+  == features of feedback images ==
+  face_ratio: {result['mediapipe']['fedb']["noscore_value"]['face_ratio']}
+  eye_open: {result['mediapipe']['fedb']["score_value"]['eye_open']}
+  eye_width: {result['mediapipe']['fedb']["score_value"]['eye_width']}
+  eye_eyebrow_distance: {result['mediapipe']['fedb']["score_value"]['eye_eyebrow_distance']}
+  eye_asymmetry: {result['mediapipe']['fedb']["score_value"]['eye_asymmetry']}
+  mouth_open: {result['mediapipe']['fedb']["score_value"]['mouth_open']}
+  mouth_width: {result['mediapipe']['fedb']["score_value"]['mouth_width']}
+  mouth_corner_lift: {result['mediapipe']['fedb']["noscore_value"]['mouth_corner_lift']}
+  mouth_asymmetry: {result['mediapipe']['fedb']["score_value"]['mouth_asymmetry']}
+  nostril_width: {result['mediapipe']['fedb']["score_value"]['nostril_width']}
+  eyebrow_slope: {result['mediapipe']['fedb']["noscore_value"]['eyebrow_slope']}
 
-== speculated emotional information of the feedback image ==
-guessed feelings: {result['siglip']['fedb']['type']['label']}, accuracy:{result['siglip']['fedb']['type']['score']}%
-Facial features guessed based on emotion: {result['siglip']['fedb']['detail']['label']}, accuracy: {result['siglip']['fedb']['detail']['score']}%
-"""
+  == speculated emotional information of the feedback image ==
+  guessed feelings: {result['siglip']['fedb']['type']['label']}, accuracy:{result['siglip']['fedb']['type']['score']}%
+  Facial features guessed based on emotion: {result['siglip']['fedb']['detail']['label']}, accuracy: {result['siglip']['fedb']['detail']['score']}%
+  """
 
-  logJob(f"{feedbackId}: {LLM_MODEL}를 사용하여 피드백 생성 중...")
-  if(LLM_MODEL == "gemini"):
-    try:
-      response = gemini_client.models.generate_content(
-        model=GEMINI_MODELNAME,
-        config=types.GenerateContentConfig(
-          system_instruction=LLM_PROMPT,
-        ),
-        contents=llm_user_msg
-      ).text
-    except Exception as e:
-      logJob(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR")
-      logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errormsg: {str(e)}")
-      return {
-        "rttype": "error",
-        "errcode": "LLM_PROCESSING_ERROR",
-        "message": f"피드백 생성 중 오류가 발생했습니다: {str(e)}"
-      }
-  elif(LLM_MODEL == "gpt"):
-    try:
-      response = gpt_client.responses.create(
-        model=GPT_MODELNAME,
-        input=[
-          {
-              "role": "system",
-              "content": LLM_PROMPT
-          },
-          {
-              "role": "user",
-              "content": llm_user_msg
-          }
-        ]
-      ).output_text
-    except Exception as e:
-      logJob(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR")
-      logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errormsg: {str(e)}")
-      return {
-        "rttype": "error",
-        "errcode": "LLM_PROCESSING_ERROR",
-        "message": f"피드백 생성 중 오류가 발생했습니다: {str(e)}"
-      }
-  logJob(f"{feedbackId}: 피드백 생성 성공!")
-  result["feedback"] = response
+    logJob(f"{feedbackId}: {LLM_MODEL}를 사용하여 피드백 생성 중...")
+    if(LLM_MODEL == "gemini"):
+      try:
+        response = gemini_client.models.generate_content(
+          model=GEMINI_MODELNAME,
+          config=types.GenerateContentConfig(
+            system_instruction=LLM_PROMPT,
+          ),
+          contents=llm_user_msg
+        ).text
+      except Exception as e:
+        logJob(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR")
+        logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errormsg: {str(e)}")
+        return {
+          "rttype": "error",
+          "errcode": "LLM_PROCESSING_ERROR",
+          "message": f"피드백 생성 중 오류가 발생했습니다: {str(e)}"
+        }
+    elif(LLM_MODEL == "gpt"):
+      try:
+        response = gpt_client.responses.create(
+          model=GPT_MODELNAME,
+          input=[
+            {
+                "role": "system",
+                "content": LLM_PROMPT
+            },
+            {
+                "role": "user",
+                "content": llm_user_msg
+            }
+          ]
+        ).output_text
+      except Exception as e:
+        logJob(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR")
+        logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errormsg: {str(e)}")
+        return {
+          "rttype": "error",
+          "errcode": "LLM_PROCESSING_ERROR",
+          "message": f"피드백 생성 중 오류가 발생했습니다: {str(e)}"
+        }
+    logJob(f"{feedbackId}: 피드백 생성 성공!")
+    result["feedback"] = response
 
+  result["feedback"] = "서비스 운영자가 LLM 피드백을 비활성화 시켰습니다."
   return result
 
 def set_job(feedbackId, **kwargs):
