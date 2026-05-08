@@ -21,11 +21,11 @@
 PROJECT_DIR = "C:\\Users\\kmc13\\minchanCoding\\camp\\lalalalalalalast\\src\\"
 ##### 실행 옵션 ####
 SERVICE_PORT = 80  ## 웹사이트가 띄어질 포트
-LLM_MODEL = "gemini"  # "gemini" or "gpt"
+LLM_MODEL = "gpt"  # "gemini" or "gpt"
 GEMINI_MODELNAME = "gemini-3.1-flash-lite-preview"  # Google이 제작한 모델 사용시 모델명 입력.
 GPT_MODELNAME = "gpt-5.1"  # OpenAI가 제작한 모델 사용시 모델명 입력.
 ##### 보안설정 #####
-COSTOM_LOGGING = "On"  ## 개발자가 커스터마이징한 로그 사용: On, 기본 로그 사용: Off
+COSTOM_LOGGING = "Off"  ## 개발자가 커스터마이징한 로그 사용: On, 기본 로그 사용: Off
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}  ## 업로드를 허용 할 파일 확장자 (프론트엔드에서는 ".png", ".jpg", ".jpeg"만 입력되도록 되어있습니다. 이 변수는 위조된 요청이 왔을 때 보안 위협을 막기 위한 추가적인 변수입니다.)
 ####################
 
@@ -243,6 +243,38 @@ def to_score(ratio, max_ratio=1.0):
 
 def distance(a, b):
   return math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
+def midpoint(a, b):
+  return {
+    "x": (a.x + b.x) / 2,
+    "y": (a.y + b.y) / 2
+  }
+
+
+def point_distance(a, b):
+  return ((a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2) ** 0.5
+
+
+def distance(a, b):
+  return ((a.x - b.x) ** 2 + (a.y - b.y) ** 2) ** 0.5
+
+
+def clamp(value, min_value=0, max_value=100):
+  return max(min_value, min(value, max_value))
+
+
+def to_score(ratio, max_ratio=1.0):
+  if max_ratio <= 0:
+    return 0
+
+  return clamp((ratio / max_ratio) * 100)
+
+def normalize(value, min_value, max_value):
+  if max_value - min_value <= 0:
+    return 0
+
+  return clamp(
+    ((value - min_value) / (max_value - min_value)) * 100
+  )
 
 def landmark(path):
   logInfo(f"landmark 함수가 호출되었습니다.")
@@ -277,8 +309,11 @@ def landmark(path):
     right_eye_height = distance(res[159], res[145])
     eye_height_avg = (left_eye_height + right_eye_height) / 2
 
-    # 양쪽 눈 사이 거리
-    interocular_distance = distance(res[133], res[362])
+    # 양쪽 눈 "중심" 사이 거리
+    # 주의: res[133] ~ res[362]는 양눈 중심 거리가 아니라 눈 사이 빈 공간에 가까움
+    left_eye_center = midpoint(res[33], res[133])
+    right_eye_center = midpoint(res[362], res[263])
+    interocular_distance = point_distance(left_eye_center, right_eye_center)
 
     # 입 기준 거리
     mouth_height = distance(res[13], res[14])
@@ -317,7 +352,7 @@ def landmark(path):
     ) / interocular_distance
 
     # 눈썹 기울기
-    # 음수/양수 값이라 0~100으로 만들기 위해 중앙값 50을 기준으로 사용
+    # 50 = 중립, 50보다 작으면 내려감, 크면 올라감
     left_eyebrow_slope = res[334].y - res[296].y
     right_eyebrow_slope = -(res[105].y - res[66].y)
 
@@ -356,23 +391,20 @@ def landmark(path):
     nose_width = distance(res[98], res[327])
     nose_width_ratio = nose_width / interocular_distance
 
-    # =========================
-    # 결과 반환
-    # =========================
     return {
       "rttype": "success",
       "data": {
         "score_value": {
-          "eye_open": round(to_score(eye_open_ratio, 0.38), 2),
-          "eye_width": round(to_score(eye_width_ratio, 0.75), 2),
-          "eye_eyebrow_distance": round(to_score(eye_eyebrow_distance_ratio, 0.45), 2),
-          "eye_asymmetry": round(to_score(eye_asymmetry_ratio, 0.35), 2),
+          "eye_open": round(normalize(eye_open_ratio, 0.02, 0.55), 2),
+          "eye_width": round(normalize(eye_width_ratio, 0.15, 0.45), 2),
+          "eye_eyebrow_distance": round(normalize(eye_eyebrow_distance_ratio, 0.05, 0.35), 2),
+          "eye_asymmetry": round(normalize(eye_asymmetry_ratio, 0.00, 0.15), 2),
 
-          "mouth_open": round(to_score(mouth_open_ratio, 0.80), 2),
-          "mouth_width": round(to_score(mouth_width_ratio, 1.60), 2),
-          "mouth_asymmetry": round(to_score(mouth_asymmetry_ratio, 0.25), 2),
+          "mouth_open": round(normalize(mouth_open_ratio, 0.00, 0.75), 2),
+          "mouth_width": round(normalize(mouth_width_ratio, 0.35, 1.10), 2),
+          "mouth_asymmetry": round(normalize(mouth_asymmetry_ratio, 0.00, 0.12), 2),
 
-          "nostril_width": round(to_score(nose_width_ratio, 0.90), 2)
+          "nostril_width": round(normalize(nose_width_ratio, 0.18, 0.55), 2)
         },
         "noscore_value": {
           "face_ratio": round(face_ratio, 4),
@@ -808,6 +840,7 @@ def api_feedback():
     or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
     or request.remote_addr
   )
+  time_data = request.form.get('time')
   if(time_data is None):
     logUser(f"[IP: {real_ip}] \"/api/feedback\": 'time' 데이터 누락. [400, Bad Request] 반환 처리 됨.")
     return {"code": 400, "message": "Bad request."}, 400
@@ -971,6 +1004,10 @@ def printStartMSG():
   print()
   print(f"서비스 URL: {Fore.GREEN}http://127.0.0.1:{SERVICE_PORT}{Style.RESET_ALL}\n            {Fore.GREEN}http://{get_local_ip()}:{SERVICE_PORT}{Style.RESET_ALL}")
   print()
+  if LLM_MODEL == "gpt":
+    print(f"{Fore.RED}{Style.BRIGHT}※주의※ {Fore.YELLOW}현재 GPT로 서비스가 실행되고 있습니다.{Style.RESET_ALL}")
+    print()
+
 
 server_ready = False
 def wait_until_server_ready():

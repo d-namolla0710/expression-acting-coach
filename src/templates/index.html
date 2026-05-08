@@ -1010,11 +1010,11 @@ Version 1.1 - 26 February 2007
             }
             
             document.getElementById(`var_result_fedb_sl_type_txt`).innerText = siglip_labels[result.siglip.fedb.type.label] + "얼굴";
-            document.getElementById(`var_result_fedb_sl_type`).dataset.label = Math.round(result.siglip.fedb.type.score * 100 * 100) / 100 + "%";
-            document.getElementById(`var_result_fedb_sl_type`).value = Number(Math.round(result.siglip.fedb.type.score * 1000));
+            document.getElementById(`var_result_fedb_sl_type`).dataset.label = Math.floor(Math.round(result.siglip.fedb.type.score * 100 * 100) / 100) + "%";
+            document.getElementById(`var_result_fedb_sl_type`).value = Number(Math.floor(Math.round(result.siglip.fedb.type.score * 1000)));
             document.getElementById(`var_result_fedb_sl_detail_txt`).innerText = result.siglip.fedb.detail.label;
-            document.getElementById(`var_result_fedb_sl_detail`).dataset.label = Math.round(result.siglip.fedb.detail.score * 100 * 100) / 100 + "%";
-            document.getElementById(`var_result_fedb_sl_detail`).value = Number(Math.round(result.siglip.fedb.detail.score * 1000));
+            document.getElementById(`var_result_fedb_sl_detail`).dataset.label = Math.floor(Math.round(result.siglip.fedb.detail.score * 100 * 100) / 100) + "%";
+            document.getElementById(`var_result_fedb_sl_detail`).value = Number(Math.floor(Math.round(result.siglip.fedb.detail.score * 1000)));
           
             var face_ratio_fedb = result.mediapipe.fedb.noscore_value.face_ratio;
             var mouth_corner_lift_fedb = result.mediapipe.fedb.noscore_value.mouth_corner_lift;
@@ -1046,17 +1046,17 @@ Version 1.1 - 26 February 2007
 
             for(var idx = 0; idx < Object.keys(result.mediapipe.fedb.score_value).length; idx++){
               var key = Object.keys(result.mediapipe.fedb.score_value)[idx];
-              document.getElementById(`var_result_fedb_mp-${idx+1}`).dataset.label = `${labels[key]}, ${Math.round(result.mediapipe.fedb.score_value[key] * 100) / 100}%`;
-              document.getElementById(`var_result_fedb_mp-${idx+1}`).value = Number(Math.round(result.mediapipe.fedb.score_value[key] * 10));
+              document.getElementById(`var_result_fedb_mp-${idx+1}`).dataset.label = `${labels[key]}, ${Math.floor(Math.round(result.mediapipe.fedb.score_value[key] * 100) / 100)}%`;
+              document.getElementById(`var_result_fedb_mp-${idx+1}`).value = Number(Math.floor(Math.round(result.mediapipe.fedb.score_value[key] * 10)));
             }
 
             if(result.mode == "imgMode"){
               document.getElementById(`var_result_trgt_sl_type_txt`).innerText = siglip_labels[result.siglip.trgt.type.label] + "얼굴";
-              document.getElementById(`var_result_trgt_sl_type`).dataset.label = Math.round(result.siglip.trgt.type.score * 100 * 100) / 100 + "%";
-              document.getElementById(`var_result_trgt_sl_type`).value = Number(Math.round(result.siglip.trgt.type.score * 1000));
+              document.getElementById(`var_result_trgt_sl_type`).dataset.label = Math.floor(Math.round(result.siglip.trgt.type.score * 100 * 100) / 100) + "%";
+              document.getElementById(`var_result_trgt_sl_type`).value = Number(Math.floor(Math.round(result.siglip.trgt.type.score * 1000)));
               document.getElementById(`var_result_trgt_sl_detail_txt`).innerText = result.siglip.trgt.detail.label;
-              document.getElementById(`var_result_trgt_sl_detail`).dataset.label = Math.round(result.siglip.trgt.detail.score * 100 * 100) / 100 + "%";
-              document.getElementById(`var_result_trgt_sl_detail`).value = Number(Math.round(result.siglip.trgt.detail.score * 1000));
+              document.getElementById(`var_result_trgt_sl_detail`).dataset.label = Math.floor(Math.round(result.siglip.trgt.detail.score * 100 * 100) / 100) + "%";
+              document.getElementById(`var_result_trgt_sl_detail`).value = Number(Math.floor(Math.round(result.siglip.trgt.detail.score * 1000)));
               
                var face_ratio_trgt = result.mediapipe.trgt.noscore_value.face_ratio;
               var mouth_corner_lift_trgt = result.mediapipe.trgt.noscore_value.mouth_corner_lift;
@@ -1088,8 +1088,8 @@ Version 1.1 - 26 February 2007
               
               for(var idx = 0; idx < Object.keys(result.mediapipe.trgt.score_value).length; idx++){
                 var key = Object.keys(result.mediapipe.trgt.score_value)[idx];
-                document.getElementById(`var_result_trgt_mp-${idx+1}`).dataset.label = `${labels[key]}, ${Math.round(result.mediapipe.trgt.score_value[key] * 100) / 100}%`;
-                document.getElementById(`var_result_trgt_mp-${idx+1}`).value = Number(Math.round(result.mediapipe.trgt.score_value[key] * 10));
+                document.getElementById(`var_result_trgt_mp-${idx+1}`).dataset.label = `${labels[key]}, ${Math.floor(Math.round(result.mediapipe.trgt.score_value[key] * 100) / 100)}%`;
+                document.getElementById(`var_result_trgt_mp-${idx+1}`).value = Number(Math.floor(Math.round(result.mediapipe.trgt.score_value[key] * 10)));
               }
             }
 
