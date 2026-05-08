@@ -21,12 +21,12 @@
 PROJECT_DIR = "C:\\Users\\kmc13\\minchanCoding\\camp\\lalalalalalalast\\src\\"
 ##### 실행 옵션 ####
 SERVICE_PORT = 80  ## 웹사이트가 띄어질 포트
-LLM_SWITCH = "Off" # llm 사용: On, llm 미사용: Off
+LLM_SWITCH = "On" # llm 사용: On, llm 미사용: Off
 LLM_MODEL = "gemini"  # "gemini" or "gpt"
 GEMINI_MODELNAME = "gemini-3.1-flash-lite-preview"  # Google이 제작한 모델 사용시 모델명 입력.
 GPT_MODELNAME = "gpt-5.1"  # OpenAI가 제작한 모델 사용시 모델명 입력.
 ##### 보안설정 #####
-COSTOM_LOGGING = "Off"  ## 개발자가 커스터마이징한 로그 사용: On, 기본 로그 사용: Off
+COSTOM_LOGGING = "On"  ## 개발자가 커스터마이징한 로그 사용: On, 기본 로그 사용: Off
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg"}  ## 업로드를 허용 할 파일 확장자 (프론트엔드에서는 ".png", ".jpg", ".jpeg"만 입력되도록 되어있습니다. 이 변수는 위조된 요청이 왔을 때 보안 위협을 막기 위한 추가적인 변수입니다.)
 ####################
 
@@ -46,6 +46,12 @@ import contextlib
 import logging
 import warnings
 from colorama import Fore, Style, init
+
+init(
+  autoreset=True,
+  strip=False,
+  convert=False
+)
 
 @contextlib.contextmanager
 def suppress_stderr():
@@ -115,8 +121,6 @@ import flask.cli
 flask.cli.show_server_banner = lambda *args, **kwargs: None
 
 
-init(autoreset=True)
-
 job_queue = Queue()
 jobs = {}
 jobs_lock = Lock()
@@ -181,13 +185,13 @@ siglip_model.eval()
 
 def logInfo(log):
   if COSTOM_LOGGING == "On":
-    print(f"{Fore.LIGHTBLUE_EX}[INFO]{Style.RESET_ALL} {log}")
+    print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}[INFO]{Style.RESET_ALL} {log}")
   elif COSTOM_LOGGING == "Off":
     pass
 
 def logUser(log):
   if COSTOM_LOGGING == "On":
-    print(f"{Fore.LIGHTGREEN_EX}[USER]{Style.RESET_ALL} {log}")
+    print(f"{Fore.LIGHTGREEN_EX}{Style.BRIGHT}[USER]{Style.RESET_ALL} {log}")
   elif COSTOM_LOGGING == "Off":
     pass
 
@@ -196,7 +200,11 @@ def logWarn(log):
     print(f"{Fore.LIGHTYELLOW_EX}{Style.BRIGHT}[WARNING]{Style.RESET_ALL} {log}")
   elif COSTOM_LOGGING == "Off":
     pass
-
+def logError(log):
+  if COSTOM_LOGGING == "On":
+    print(f"{Fore.RED}{Style.BRIGHT}[ERROR]{Style.RESET_ALL} {log}")
+  elif COSTOM_LOGGING == "Off":
+    pass
 def logJob(log):
   if COSTOM_LOGGING  == "On":
     print(f"{Fore.LIGHTGREEN_EX}{Style.BRIGHT}[JOB]{Style.RESET_ALL} {log}")
@@ -289,6 +297,7 @@ def landmark(path):
         detect_result = landmarker.detect(mp_image)
 
     if not detect_result.face_landmarks:
+      logWarn("landmark 함수에서 FACE_NOT_FOUND 발생")
       return {
         "rttype": "error",
         "errcode": "FACE_NOT_FOUND",
@@ -329,10 +338,11 @@ def landmark(path):
       interocular_distance,
       mouth_width
     ) <= 0.0001:
+      logWarn("landmark 함수에서 FACE_SIZE_ERROR 발생")
       return {
         "rttype": "error",
         "errcode": "FACE_SIZE_ERROR",
-        "message": "얼굴 기준 거리가 너무 작습니다."
+        "message": "얼굴 크기가 너무 작습니다."
       }
 
     # =========================
@@ -417,11 +427,11 @@ def landmark(path):
     }
 
   except Exception as e:
-    logWarn(f"Landmark 처리 중 오류 발생. errormsg: {str(e)}")
+    logError(f"FaceLandmark 처리 중 오류 발생. errormsg: {str(e)}")
     return {
       "rttype": "error",
       "errcode": "LANDMARK_PROCESSING_ERROR",
-      "message": f"Landmark 처리 중 오류가 발생했습니다: {str(e)}"
+      "message": f"FaceLandmark 처리 중 오류가 발생했습니다."
     }
 
 def siglip_classify(image, texts):
@@ -510,14 +520,14 @@ def siglip(path):
     return {
       "rttype": "error",
       "errcode": "SIGLIP_PROCESSING_ERROR",
-      "message": f"SigLIP 처리 중 오류가 발생했습니다: {str(e)}"
+      "message": f"SigLIP 처리 중 오류가 발생했습니다."
     }
 
 def feedback(feedbackId):
   inputdata = get_item(feedbackId)
 
   if inputdata is None:
-    logJob(f"{feedbackId}: 오류. 피드백 데이터를 찾을 수 없습니다. errcode: FEEDBACK_NOT_FOUND")
+    logWarn(f"{feedbackId}: 오류. 피드백 데이터를 찾을 수 없습니다. errcode: FEEDBACK_NOT_FOUND")
     return {
       "rttype": "error",
       "errcode": "FEEDBACK_NOT_FOUND",
@@ -528,7 +538,7 @@ def feedback(feedbackId):
   prompt = inputdata.get("prompt")
 
   if mode not in ["imgMode", "txtMode"]:
-    logJob(f"{feedbackId}: 오류. 알 수 없는 모드가 입력 되었습니다. mode: {mode}, errcode: MODE_ERROR")
+    logWarn(f"{feedbackId}: 오류. 알 수 없는 모드가 입력 되었습니다. mode: {mode}, errcode: MODE_ERROR")
     return {
       "rttype": "error",
       "errcode": "MODE_ERROR",
@@ -536,7 +546,7 @@ def feedback(feedbackId):
     }
 
   if mode == "imgMode" and not inputdata.get("trgt"):
-    logJob(f"{feedbackId}: 오류. 목표 이미지 데이터가 존재하지 않습니다. mode: {mode}, errcode: TARGET_IMAGE_NOT_FOUND")
+    logWarn(f"{feedbackId}: 오류. 목표 이미지 데이터가 존재하지 않습니다. mode: {mode}, errcode: TARGET_IMAGE_NOT_FOUND")
     return {
       "rttype": "error",
       "errcode": "TARGET_IMAGE_NOT_FOUND",
@@ -564,7 +574,7 @@ def feedback(feedbackId):
   logJob(f"{feedbackId}: 피드백 이미지 landmark 분석이 시작되었습니다.")
   fedb_landmark = landmark(inputdata["fedb"])
   if fedb_landmark["rttype"] != "success":
-    logJob(f"{feedbackId}: 피드백 이미지 landmark 분석 중 오류가 발생했습니다. errcode: {fedb_landmark.get('errcode')}")
+    logWarn(f"{feedbackId}: 피드백 이미지 landmark 분석 중 오류가 발생했습니다. errcode: {fedb_landmark.get('errcode')}")
     return fedb_landmark
   logJob(f"{feedbackId}: 피드백 이미지 landmark 분석 성공!")
 
@@ -576,7 +586,7 @@ def feedback(feedbackId):
   logJob(f"{feedbackId}: 피드백 이미지 siglip 분석이 시작되었습니다.")
   fedb_siglip = siglip(inputdata["fedb"])
   if fedb_siglip["rttype"] != "success":
-    logJob(f"{feedbackId}: 피드백 이미지 siglip 분석 중 오류가 발생했습니다. errcode: {fedb_siglip.get('errcode')}")
+    logWarn(f"{feedbackId}: 피드백 이미지 siglip 분석 중 오류가 발생했습니다. errcode: {fedb_siglip.get('errcode')}")
     return fedb_siglip
   logJob(f"{feedbackId}: 피드백 이미지 siglip 분석 성공!")
   result = {
@@ -605,7 +615,7 @@ def feedback(feedbackId):
     logJob(f"{feedbackId}: 목표 이미지 landmark 분석이 시작되었습니다.")
     trgt_landmark = landmark(inputdata["trgt"])
     if trgt_landmark["rttype"] != "success":
-      logJob(f"{feedbackId}: 목표 이미지 landmark 분석 중 오류가 발생했습니다. errcode: {trgt_landmark.get('errcode')}")
+      logWarn(f"{feedbackId}: 목표 이미지 landmark 분석 중 오류가 발생했습니다. errcode: {trgt_landmark.get('errcode')}")
       return trgt_landmark
     logJob(f"{feedbackId}: 목표 이미지 landmark 분석 성공!")
 
@@ -617,7 +627,7 @@ def feedback(feedbackId):
     logJob(f"{feedbackId}: 목표 이미지 siglip 분석이 시작되었습니다.")
     trgt_siglip = siglip(inputdata["trgt"])
     if trgt_siglip["rttype"] != "success":
-      logJob(f"{feedbackId}: 목표 이미지 siglip 분석 중 오류가 발생했습니다. errcode: {trgt_siglip.get('errcode')}")
+      logWarn(f"{feedbackId}: 목표 이미지 siglip 분석 중 오류가 발생했습니다. errcode: {trgt_siglip.get('errcode')}")
       return trgt_siglip
     logJob(f"{feedbackId}: 목표 이미지 siglip 분석 성공!")
 
@@ -636,65 +646,91 @@ def feedback(feedbackId):
     )
 
     if(mode == "imgMode"):
-      llm_user_msg = f"""mode: {mode},
-  User`s prompt: {prompt},
+      try:
+        llm_user_msg = f"""mode: {mode},
+          User`s prompt: {prompt},
 
-  == features of feedback images ==
-  face_ratio: {result['mediapipe']['fedb']["noscore_value"]['face_ratio']}
-  eye_open: {result['mediapipe']['fedb']["score_value"]['eye_open']}
-  eye_width: {result['mediapipe']['fedb']["score_value"]['eye_width']}
-  eye_eyebrow_distance: {result['mediapipe']['fedb']["score_value"]['eye_eyebrow_distance']}
-  eye_asymmetry: {result['mediapipe']['fedb']["score_value"]['eye_asymmetry']}
-  mouth_open: {result['mediapipe']['fedb']["score_value"]['mouth_open']}
-  mouth_width: {result['mediapipe']['fedb']["score_value"]['mouth_width']}
-  mouth_corner_lift: {result['mediapipe']['fedb']["noscore_value"]['mouth_corner_lift']}
-  mouth_asymmetry: {result['mediapipe']['fedb']["score_value"]['mouth_asymmetry']}
-  nostril_width: {result['mediapipe']['fedb']["score_value"]['nostril_width']}
-  eyebrow_slope: {result['mediapipe']['fedb']["noscore_value"]['eyebrow_slope']}
+          == features of feedback images ==
+          face_ratio: {result['mediapipe']['fedb']['noscore_value']['face_ratio']}
+          eye_open: {result['mediapipe']['fedb']['score_value']['eye_open']}
+          eye_width: {result['mediapipe']['fedb']['score_value']['eye_width']}
+          eye_asymmetry: {result['mediapipe']['fedb']['score_value']['eye_asymmetry']}
 
-  == speculated emotional information of the feedback image ==
-  guessed feelings: {result['siglip']['fedb']['type']['label']}, accuracy:{result['siglip']['fedb']['type']['score']}%
-  Facial features guessed based on emotion: {result['siglip']['fedb']['detail']['label']}, accuracy: {result['siglip']['fedb']['detail']['score']}%
+          mouth_open: {result['mediapipe']['fedb']['score_value']['mouth_open']}
+          mouth_width: {result['mediapipe']['fedb']['score_value']['mouth_width']}
+          mouth_corner_lift: {result['mediapipe']['fedb']['noscore_value']['mouth_corner_lift']}
+          mouth_asymmetry: {result['mediapipe']['fedb']['score_value']['mouth_asymmetry']}
 
-  == features of target images ==
-  face_ratio: {result['mediapipe']['trgt']["noscore_value"]['face_ratio']}
-  eye_open: {result['mediapipe']['trgt']["score_value"]['eye_open']}
-  eye_width: {result['mediapipe']['trgt']["score_value"]['eye_width']}
-  eye_eyebrow_distance: {result['mediapipe']['trgt']["score_value"]['eye_eyebrow_distance']}
-  eye_asymmetry: {result['mediapipe']['trgt']["score_value"]['eye_asymmetry']}
-  mouth_open: {result['mediapipe']['trgt']["score_value"]['mouth_open']}
-  mouth_width: {result['mediapipe']['trgt']["score_value"]['mouth_width']}
-  mouth_corner_lift: {result['mediapipe']['trgt']["noscore_value"]['mouth_corner_lift']}
-  mouth_asymmetry: {result['mediapipe']['trgt']["score_value"]['mouth_asymmetry']}
-  nostril_width: {result['mediapipe']['trgt']["score_value"]['nostril_width']}
-  eyebrow_slope: {result['mediapipe']['trgt']["noscore_value"]['eyebrow_slope']}
+          nostril_width: {result['mediapipe']['fedb']['score_value']['nostril_width']}
 
-  == speculated emotional information of the target image ==
-  guessed feelings: {result['siglip']['trgt']['type']['label']}, accuracy:{result['siglip']['trgt']['type']['score']}%
-  Facial features guessed based on emotion: {result['siglip']['trgt']['detail']['label']}, accuracy: {result['siglip']['trgt']['detail']['score']}%
-  """
+          eyebrow_slope: {result['mediapipe']['fedb']['noscore_value']['eyebrow_slope']}
+          eyebrow_balance: {result['mediapipe']['fedb']['noscore_value']['eyebrow_balance']}
+
+          == speculated emotional information of the feedback image ==
+          guessed feeling: {result['siglip']['fedb']['type']['label']}
+          feeling analysis label: {result['siglip']['fedb']['type']['analysis_label']}
+          feeling accuracy: {result['siglip']['fedb']['type']['score'] * 100:.2f}%
+
+          guessed facial detail: {result['siglip']['fedb']['detail']['label']}
+          detail analysis label: {result['siglip']['fedb']['detail']['analysis_label']}
+          detail accuracy: {result['siglip']['fedb']['detail']['score'] * 100:.2f}%
+
+          emotion distribution:
+          {result['siglip']['fedb']['type']['scores']}
+
+          detail distribution:
+          {result['siglip']['fedb']['detail']['scores']}
+        """
+      except Exception as e:
+        logError(f"{feedbackId}, imgMode: LLM 프롬프트 완성 중 에러 발생. errcode: {str(e)}")
+        return {
+          "rttype": "error",
+          "errcode": "LLM_PROMPT_ERROR",
+          "message": f"프롬프트 완성 중 오류가 발생했습니다."
+        }
     elif(mode == "txtMode"):
-      llm_user_msg = f"""mode: {mode},
-  User`s prompt: {prompt},
+      try:
+        llm_user_msg = f"""mode: {mode},
+          User`s prompt: {prompt},
 
-  == features of feedback images ==
-  face_ratio: {result['mediapipe']['fedb']["noscore_value"]['face_ratio']}
-  eye_open: {result['mediapipe']['fedb']["score_value"]['eye_open']}
-  eye_width: {result['mediapipe']['fedb']["score_value"]['eye_width']}
-  eye_eyebrow_distance: {result['mediapipe']['fedb']["score_value"]['eye_eyebrow_distance']}
-  eye_asymmetry: {result['mediapipe']['fedb']["score_value"]['eye_asymmetry']}
-  mouth_open: {result['mediapipe']['fedb']["score_value"]['mouth_open']}
-  mouth_width: {result['mediapipe']['fedb']["score_value"]['mouth_width']}
-  mouth_corner_lift: {result['mediapipe']['fedb']["noscore_value"]['mouth_corner_lift']}
-  mouth_asymmetry: {result['mediapipe']['fedb']["score_value"]['mouth_asymmetry']}
-  nostril_width: {result['mediapipe']['fedb']["score_value"]['nostril_width']}
-  eyebrow_slope: {result['mediapipe']['fedb']["noscore_value"]['eyebrow_slope']}
+          == features of feedback images ==
+          face_ratio: {result['mediapipe']['fedb']['noscore_value']['face_ratio']}
+          eye_open: {result['mediapipe']['fedb']['score_value']['eye_open']}
+          eye_width: {result['mediapipe']['fedb']['score_value']['eye_width']}
+          eye_asymmetry: {result['mediapipe']['fedb']['score_value']['eye_asymmetry']}
 
-  == speculated emotional information of the feedback image ==
-  guessed feelings: {result['siglip']['fedb']['type']['label']}, accuracy:{result['siglip']['fedb']['type']['score']}%
-  Facial features guessed based on emotion: {result['siglip']['fedb']['detail']['label']}, accuracy: {result['siglip']['fedb']['detail']['score']}%
-  """
+          mouth_open: {result['mediapipe']['fedb']['score_value']['mouth_open']}
+          mouth_width: {result['mediapipe']['fedb']['score_value']['mouth_width']}
+          mouth_corner_lift: {result['mediapipe']['fedb']['noscore_value']['mouth_corner_lift']}
+          mouth_asymmetry: {result['mediapipe']['fedb']['score_value']['mouth_asymmetry']}
 
+          nostril_width: {result['mediapipe']['fedb']['score_value']['nostril_width']}
+
+          eyebrow_slope: {result['mediapipe']['fedb']['noscore_value']['eyebrow_slope']}
+          eyebrow_balance: {result['mediapipe']['fedb']['noscore_value']['eyebrow_balance']}
+
+          == speculated emotional information of the feedback image ==
+          guessed feeling: {result['siglip']['fedb']['type']['label']}
+          feeling analysis label: {result['siglip']['fedb']['type']['analysis_label']}
+          feeling accuracy: {result['siglip']['fedb']['type']['score'] * 100:.2f}%
+
+          guessed facial detail: {result['siglip']['fedb']['detail']['label']}
+          detail analysis label: {result['siglip']['fedb']['detail']['analysis_label']}
+          detail accuracy: {result['siglip']['fedb']['detail']['score'] * 100:.2f}%
+
+          emotion distribution:
+          {result['siglip']['fedb']['type']['scores']}
+
+          detail distribution:
+          {result['siglip']['fedb']['detail']['scores']}
+        """
+      except Exception as e:
+        logError(f"{feedbackId}, txtMode: LLM 프롬프트 완성 중 에러 발생. errcode: {str(e)}")
+        return {
+          "rttype": "error",
+          "errcode": "LLM_PROMPT_ERROR",
+          "message": f"프롬프트 완성 중 오류가 발생했습니다."
+        }
     logJob(f"{feedbackId}: {LLM_MODEL}를 사용하여 피드백 생성 중...")
     if(LLM_MODEL == "gemini"):
       try:
@@ -706,12 +742,11 @@ def feedback(feedbackId):
           contents=llm_user_msg
         ).text
       except Exception as e:
-        logJob(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR")
-        logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errormsg: {str(e)}")
+        logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR, errormsg: {str(e)}")
         return {
           "rttype": "error",
           "errcode": "LLM_PROCESSING_ERROR",
-          "message": f"피드백 생성 중 오류가 발생했습니다: {str(e)}"
+          "message": f"피드백 생성 중 오류가 발생했습니다"
         }
     elif(LLM_MODEL == "gpt"):
       try:
@@ -729,18 +764,19 @@ def feedback(feedbackId):
           ]
         ).output_text
       except Exception as e:
-        logJob(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR")
-        logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errormsg: {str(e)}")
+        logWarn(f"{feedbackId}: 피드백 생성 중 오류 발생. errcode: LLM_PROCESSING_ERROR, errormsg: {str(e)}")
         return {
           "rttype": "error",
           "errcode": "LLM_PROCESSING_ERROR",
-          "message": f"피드백 생성 중 오류가 발생했습니다: {str(e)}"
+          "message": f"피드백 생성 중 오류가 발생했습니다"
         }
     logJob(f"{feedbackId}: 피드백 생성 성공!")
     result["feedback"] = response
+  else:
+    result["feedback"] = "서비스 운영자가 LLM 피드백을 비활성화 시켰습니다."
 
-  result["feedback"] = "서비스 운영자가 LLM 피드백을 비활성화 시켰습니다."
   return result
+
 
 def set_job(feedbackId, **kwargs):
   with jobs_lock:
@@ -790,7 +826,7 @@ def worker():
         )
 
     except Exception as e:
-      logWarn(f"500, Worker Error: {e}")
+      logWarn(f"500, Worker Error: {str(e)}")
       set_job(
         feedbackId,
         status="error",
@@ -814,17 +850,17 @@ from flask import request
 
 @app.before_request
 def log_all_requests():
-  real_ip = (
-    request.headers.get("CF-Connecting-IP")
-    or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
-    or request.remote_addr
-  )
+  if COSTOM_LOGGING == "On":
+    real_ip = (
+      request.headers.get("CF-Connecting-IP")
+      or request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+      or request.remote_addr
+    )
 
-  print(
-    f'[USER] [IP: {real_ip}] '
-    f'{request.path} 요청. route: "{request.path}" | Method: {request.method}',
-    flush=True
-  )
+    print(
+      f'{Fore.LIGHTGREEN_EX}[USER]{Style.RESET_ALL} [IP: {real_ip}] '
+      f'{request.path} 요청. route: "{request.path}" | Method: {request.method}'
+    )
 
 
 @app.errorhandler(404)
@@ -908,7 +944,8 @@ def api_feedback():
       "fedb": fedb_path,
       "trgt": trgt_path,
       "prompt": prompt,
-      "time": time_data
+      "time": time_data,
+      "ipAddr": real_ip
     })
   elif(mode == "txtMode"):
     fedb_img = request.files.get("fedbImg")
@@ -935,7 +972,8 @@ def api_feedback():
       "mode": mode,
       "fedb": fedb_path,
       "prompt": prompt,
-      "time": time_data
+      "time": time_data,
+      "ipAddr": real_ip
     })
   else:
     logInfo(f"\"/api/feedback\": 'mode' 데이터 누락. [400, mode error] 반환 처리 됨.")

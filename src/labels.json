@@ -1,9 +1,9 @@
 {
   "feeling_types": {
-    "happy": "a smiling face with raised mouth corners",
-    "sad": "a face with low energy and downturned mouth corners",
-    "angry": "a tense face with sharp eyes and tightly furrowed eyebrows",
-    "neutral": "a neutral face with relaxed facial muscles"
+    "happy": "happy smiling cheerful face",
+    "sad": "sad tired face",
+    "angry": "angry serious face",
+    "neutral": "neutral calm face"
   },
   "labels": {
     "happy": {
