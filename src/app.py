@@ -22,7 +22,7 @@ PROJECT_DIR = "C:\\Users\\kmc13\\minchanCoding\\camp\\lalalalalalalast\\src\\"
 ##### 실행 옵션 ####
 SERVICE_PORT = 80  ## 웹사이트가 띄어질 포트
 LLM_SWITCH = "On" # llm 사용: On, llm 미사용: Off
-LLM_MODEL = "gemini"  # "gemini" or "gpt"
+LLM_MODEL = "gpt"  # "gemini" or "gpt"
 GEMINI_MODELNAME = "gemini-3.1-flash-lite-preview"  # Google이 제작한 모델 사용시 모델명 입력.
 GPT_MODELNAME = "gpt-5.1"  # OpenAI가 제작한 모델 사용시 모델명 입력.
 ##### 보안설정 #####
