@@ -12,5 +12,5 @@ Pillow
 google-genai
 openai
 
-# env
-python-dotenv
+# env   
+python-dotenv 

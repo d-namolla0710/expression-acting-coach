@@ -1,3 +1,6 @@
+# 함께해줘서 고마워! Team 23!
+
+
 # 표정연기 도우미 AI #
 
 
@@ -35,8 +38,8 @@
 - 서비스: 서비스 미제공 (Service: Unavailable)
 <img src="https://raw.githubusercontent.com/d-namolla0710/README_Source/refs/heads/main/StatusBedge/service/Unavailable.svg" alt="서비스 미제공" width="30%">
 
-- 업데이트 제공: 업데이트 지원 중 (Update: Supported)
-<img src="https://raw.githubusercontent.com/d-namolla0710/README_Source/refs/heads/main/StatusBedge/update/Supported.svg" alt="업데이트 지원 중" width="30%">
+- 업데이트 제공: 업데이트 지원 중단 (Update: Unsupported)
+<img src="https://raw.githubusercontent.com/d-namolla0710/README_Source/refs/heads/main/StatusBedge/update/Unsupported.svg" alt="업데이트 지원 중단" width="30%">
 
 -------
 
@@ -140,127 +143,9 @@ LG AI 청소년 캠프 3기 23팀 팀원들:
 - 윤효령 (기획, SigLIP 라벨 제작)
 
 특별히 감사드립니다:
-- 강현욱 멘토님
+- **강현욱 멘토님**
 - 김회민 코디님
 - 신영길 교수님
 - 그 외 LG AI 청소년 캠프 3기 관계자 분들
 - ChatGPT (By OpenAI, AI 어시스턴트)
 - 그 외 사용된 LLM 서비스들
-
-<br>
-<br>
-<br>
-<br>
-
--------
-
-### 아래는 영문 README 입니다. <br> (Below is the English README.)
-#### Translation By ChatGPT
-
--------
-<br>
-
-> ⚠️ No English UI yet 😅<br>
-> The web interface is currently Korean-only.<br>
-> English support might come later!
-
-
-
-> This project was developed with financial support and guidance from the LG AI Youth Camp.
-
-> This project is licensed under the `GNU General Public License (GPL) v3.0`.<br>
-> For more details about this license, please refer to the `LICENSE` file.
-
-> The models used in this project, `SigLIP` and `MediaPipe Face Landmarker`, are licensed under the `Apache License 2.0`.<br><br>
-> We hereby clarify that the license of the models (`Apache License 2.0`) is **compatible** with this project's license (`GNU General Public License (GPL) v3.0`).<br><br>
-> The `MediaPipe Face Landmarker` model file was downloaded from [this page](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker/python?hl=ko), and the full text of the `Apache License 2.0` can be found at `/models/LICENSE (Mediapipe Face Landmarker)`.
-
-> For inquiries regarding this project, please contact <rlaalscks130710@gmail.com>.
-
-<br>
-<br>
-<br>
-
-## This project is...
-This project is designed to help users improve their facial expression acting.
-
-### Usage
-
-When you click the `Start!!` button on the start screen, you will see a screen like the one below:<br><br>
-<img src="./readmeSource/사용법_업로드화면_이미지KR.png" alt="usage_upload_screen" width="50%">
-
-Here, the **feedback mode changes depending on which input fields are filled**.<br>
-There are two feedback modes: `Image Mode` and `Text Mode`.
-
-**Image Mode** is activated when both a `feedback image` and a `target image` are provided.<br>
-The AI will give feedback to help you **match the target image**.<br>
-(The `scenario / image description` field is optional, but if provided, it will be used as additional context.)
-
-**Text Mode** is activated when a `feedback image` and a `scenario / image description` are provided.<br>
-The AI will give feedback to help you **match the intended scenario or expression**.<br>
-(If a `target image` is provided, it will be recognized as Image Mode.)
-
-### System Architecture
-
-The system operates as follows:
-
-1. Determine the feedback mode based on user input  
-   (The criteria are described in the [Usage](#usage) section)
-2. Send input data from the client to the server according to the selected mode  
-3. Analyze the image on the server  
-4. Generate feedback based on the analyzed image  
-5. Send the generated feedback back to the client  
-6. Display the feedback on the client  
-
-Image analysis is performed using SigLIP and MediaPipe Face Landmarker, and feedback generation is powered by GPT-5.1.<br>
-(For more details, see the [Models / Libraries / Fonts](#models--libraries--fonts) section below.)
-
-## Folder Structure
-
-```
- Project
- ┣ 📂models
- ┃  ┣ face_landmarker.task
- ┃  ┗ LICENSE (Mediapipe Face Landmarker)
- ┣ 📂readmeSource
- ┃  ┗ 사용법_업로드화면_이미지KR.png
- ┣ 📂src
- ┃  ┣ 📂templates
- ┃  ┃  ┗ index.html
- ┃  ┣ app.py
- ┃  ┗ uploadDatas.json
- ┣ .gitignore
- ┣ LICENSE
- ┗ README.md
-```
-
-The source code is located in `/src/`, and the `/models/` directory contains the **model files used in this project** along with their **license files**.
-
-Images uploaded from the frontend are stored in the `/src/upload/` directory, which is created at runtime.
-
-## Models / Libraries / Fonts
-
-> This project uses `SigLIP`, `MediaPipe Face Landmarker`, and the `GPT-5.1 API`. It also applies the `Nanum font(NanumSquare)` provided by `NAVER`.
-
-`SigLIP` is used via the `transformers` library.<br>
-`MediaPipe Face Landmarker` is used via the `mediapipe` library with the `face_landmarker.task` file downloaded from [this page](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker/python?hl=ko).
-
-The frontend uses the `NanumSquare` font provided by `NAVER`.
-
-
-## Credits
-
-This project was conceived and developed by `Team 23 of the LG AI Youth Camp (3rd Cohort)`.
-
-Team 23 Members:
-- Dowon Kim (Backend Developer)
-- Minchan Kim (Full-Stack Development & Integration)
-- Hyoryeong Yoon (Planner, Make SigLIP labels)
-
-Special thanks to:
-- Hyunwook Kang, Mentor
-- Hoemin Kim, Coordinator
-- Younggil Shin, Professor
-- All staff members of the LG AI Youth Camp (3rd Cohort)
-- ChatGPT (By OpenAI, AI Assistant)
-- Other LLM Services Used in This Project

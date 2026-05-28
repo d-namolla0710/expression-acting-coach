@@ -123,7 +123,7 @@ You MUST always follow this exact structure without any modification.
   - (Analysis based on eyebrow_slope, eye_eyebrow_distance)
 - Mouth:
   - (Analysis based on mouth_open, mouth_width, mouth_corner_lift)
-- Other:
+- Other: 
   - (nostril_open, face_ratio, etc. only if needed)
 
 4. ⚠️ Key Weakness (1~2 only)
